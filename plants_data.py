@@ -1,0 +1,807 @@
+# plants_data.py - Das ultimative Profi-Lexikon (Stand April 2026)
+
+PLANTS_REGISTRY = {
+    "acer_campestre": {
+        "de": "Feldahorn", "lat": "Acer campestre", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Extrem klimaresistent, sehr wertvoll für Insekten."
+    },
+    "acer_palmatum": {
+        "de": "Japanischer Ahorn", "lat": "Acer palmatum",
+        "needs_acid_soil": False, "wind_resistence": "gering", "drought_tolerance": "gering",
+        "note": "Empfindlich gegen Spätfrost und pralle Mittagssonne."
+    },
+    "acer_platanoides_globosum": {
+        "de": "Kugel-Ahorn", "lat": "Acer platanoides 'Globosum'", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Idealer Hausbaum, kompakt bleibend."
+    },
+    "acer_tataricum": {
+        "de": "Steppen-Ahorn", "lat": "Acer tataricum",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Hitzeverträglich, sehr schöne Herbstfärbung."
+    },
+    "achillea_millefolium": {
+        "de": "Schafgarbe", "lat": "Achillea millefolium", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Heilpflanze, sehr trockenheitsresistent."
+    },
+    "aconitum_napellus": {
+        "de": "Blauer Eisenhut", "lat": "Aconitum napellus", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "gering",
+        "restriction": "EXTREM GIFTIG! Nicht in Reichweite von Kindern pflanzen."
+    },
+    "actaea_simplex": {
+        "de": "Garten-Silberkerze", "lat": "Actaea simplex",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "gering",
+        "note": "Duftende Spätblüher für halbschattige Lagen."
+    },
+    "alchemilla_mollis": {
+        "de": "Frauenmantel", "lat": "Alchemilla mollis",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Robustester Bodendecker, fängt Tautropfen dekorativ auf."
+    },
+    "amelanchier_lamarckii": {
+        "de": "Felsenbirne", "lat": "Amelanchier lamarckii", "fire_blight_risk": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Essbare Früchte, spektakuläre Herbstfärbung. Feuerbrand-Wirt!"
+    },
+    "anemone_hupehensis": {
+        "de": "Herbst-Anemone", "lat": "Anemone hupehensis",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Lange Blütezeit bis in den Spätherbst."
+    },
+    "astilbe": {
+        "de": "Prachtspiere", "lat": "Astilbe",
+        "needs_acid_soil": True, "wind_resistence": "gering", "drought_tolerance": "gering",
+        "note": "Prächtige Blütenwedel für schattige, feuchte Standorte."
+    },
+    "astrantia_major": {
+        "de": "Sterndolde", "lat": "Astrantia major", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "gering",
+        "note": "Filigrane Wildstaude für halbschattige Plätze."
+    },
+    "aubrieta": {
+        "de": "Blaukissen", "lat": "Aubrieta",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Klassische Polsterstaude für Steinmauern."
+    },
+    "berberis_thunbergii_atropurpurea": {
+        "de": "Blutberberitze", "lat": "Berberis thunbergii 'Atropurpurea'",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "restriction": "Dornig, ökologisch wertvoll als Vogelschutzgehölz."
+    },
+    "bergenia_cordifolia": {
+        "de": "Bergenie", "lat": "Bergenia cordifolia",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Wintergrünes Laub, extrem anspruchslos."
+    },
+    "betula_pendula": {
+        "de": "Hängebirke", "lat": "Betula pendula", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Pionierbaum, hoher Wasserverbrauch."
+    },
+    "brunnera_macrophylla": {
+        "de": "Kaukasus-Vergissmeinnicht", "lat": "Brunnera macrophylla",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Hervorragender Blattschmuck für den Schatten."
+    },
+    "buddleja_davidii": {
+        "de": "Sommerflieder", "lat": "Buddleja davidii",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "restriction": "Invasive Tendenz, Rückschnitt im Frühjahr zwingend."
+    },
+    "buxus_sempervirens": {
+        "de": "Buchsbaum", "lat": "Buxus sempervirens",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "restriction": "Starker Befall durch Buchsbaumzünsler möglich."
+    },
+    "campanula": {
+        "de": "Glockenblume", "lat": "Campanula", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Zahlreiche heimische Arten vorhanden."
+    },
+    "carpinus_betulus": {
+        "de": "Hainbuche", "lat": "Carpinus betulus", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Sehr robust, wertvoll für Vögel."
+    },
+    "carpinus_betulus_fastigiata": {
+        "de": "Säulenhainbuche", "lat": "Carpinus betulus 'Fastigiata'", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Ideal für schmale Alleen oder als architektonisches Element."
+    },
+    "castanea_sativa": {
+        "de": "Esskastanie", "lat": "Castanea sativa", "needs_acid_soil": True,
+        "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Wärmeliebend, wertvolle Nutzpflanze. Mag keinen Kalk!"
+    },
+    "coreopsis": {
+        "de": "Mädchenauge", "lat": "Coreopsis",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Dauerblüher für vollsonnige Beete."
+    },
+    "cornus_kousa": {
+        "de": "Blumen-Hartriegel", "lat": "Cornus kousa",
+        "needs_acid_soil": True, "wind_resistence": "gering", "drought_tolerance": "mittel",
+        "note": "Exotische Blüten und essbare (faserige) Früchte."
+    },
+    "cornus_mas": {
+        "de": "Kornelkirsche", "lat": "Cornus mas", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Wichtigster Frühblüher für Bienen, essbare Früchte."
+    },
+    "cornus_sanguinea": {
+        "de": "Roter Hartriegel", "lat": "Cornus sanguinea", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Intensive rote Zweigfärbung im Winter."
+    },
+    "cornus_stolonifera_flaviramea": {
+        "de": "Gelber Hartriegel", "lat": "Cornus stolonifera 'Flaviramea'",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Auffällige gelbe Rinde im Winter."
+    },
+    "crataegus_monogyna": {
+        "de": "Weißdorn", "lat": "Crataegus monogyna", "native": True, "fire_blight_risk": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Bestes Vogelschutzgehölz. Achtung: Hauptwirt für Feuerbrand!"
+    },
+    "cupressocyparis_leylandii": {
+        "de": "Leyland-Zypresse", "lat": "Cupressocyparis leylandii",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "restriction": "Extrem schnellwachsend, braucht regelmäßigen Schnitt."
+    },
+    "delphinium": {
+        "de": "Rittersporn", "lat": "Delphinium",
+        "needs_acid_soil": False, "wind_resistence": "gering", "drought_tolerance": "mittel",
+        "restriction": "Giftig. Braucht viele Nährstoffe und Stützen."
+    },
+    "deutzia_scabra": {
+        "de": "Hoher Maiblumenstrauch", "lat": "Deutzia scabra",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Anspruchsloser Blütenstrauch."
+    },
+    "dryas_octopetala": {
+        "de": "Silberwurz", "lat": "Dryas octopetala", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Alpiner Bodendecker, sehr langlebig."
+    },
+    "echinacea_purpurea": {
+        "de": "Purpur-Sonnenhut", "lat": "Echinacea purpurea",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Magnet für Bienen und Schmetterlinge."
+    },
+    "echinops_ritro": {
+        "de": "Kugeldistel", "lat": "Echinops ritro",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Trockenheitsresistent, sehr dekorative blaue Köpfe."
+    },
+    "elaeagnus_ebbingei": {
+        "de": "Wintergrüne Ölweide", "lat": "Elaeagnus ebbingei",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Extrem hitzefest, duftende Blüten im Herbst."
+    },
+    "epimedium": {
+        "de": "Elfenblume", "lat": "Epimedium",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Bester Bodendecker für den trockenen Schatten unter Bäumen."
+    },
+    "euonymus_europaeus": {
+        "de": "Pfaffenkäppchen", "lat": "Euonymus europaeus", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "restriction": "Giftig! Markante Früchte im Herbst."
+    },
+    "fagus_sylvatica": {
+        "de": "Rotbuche", "lat": "Fagus sylvatica", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Heimischer Waldbaum, verträgt keine Staunässe."
+    },
+    "fagus_sylvatica_purpurea": {
+        "de": "Blutbuche", "lat": "Fagus sylvatica f. purpurea", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Dunkelrotes Laub, sehr langlebig."
+    },
+    "fargesia_murielae": {
+        "de": "Schirmbambus", "lat": "Fargesia murielae",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Horstbildend (keine Ausläufer), immergrün."
+    },
+    "gaura_lindheimeri": {
+        "de": "Prachtkerze", "lat": "Gaura lindheimeri",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Leichte Staude, braucht durchlässigen Boden."
+    },
+    "geranium": {
+        "de": "Storchschnabel", "lat": "Geranium", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Vielseitigster Bodendecker für Sonne und Schatten."
+    },
+    "ginkgo_biloba": {
+        "de": "Ginkgo", "lat": "Ginkgo biloba",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Lebendes Fossil, sehr resistent gegen Abgase."
+    },
+    "hedera_helix": {
+        "de": "Efeu", "lat": "Hedera helix", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Immergrüner Kletterkünstler, ökologisch sehr wertvoll."
+    },
+    "helenium": {
+        "de": "Sonnenbraut", "lat": "Helenium",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Prachtvolle Spätsommerstaude für volle Sonne."
+    },
+    "helleborus_niger": {
+        "de": "Christrose", "lat": "Helleborus niger", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Blüht im tiefsten Winter."
+    },
+    "hemerocallis": {
+        "de": "Taglilie", "lat": "Hemerocallis",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Essbare Blüten, sehr langlebig und pflegeleicht."
+    },
+    "heuchera": {
+        "de": "Purpurglöckchen", "lat": "Heuchera",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Enorme Farbvielfalt beim Laub."
+    },
+    "hibiscus_syriacus": {
+        "de": "Garten-Eibisch", "lat": "Hibiscus syriacus",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Spätblüher im August/September."
+    },
+    "hippophae_rhamnoides": {
+        "de": "Sanddorn", "lat": "Hippophae rhamnoides", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "extrem", "drought_tolerance": "hoch",
+        "note": "Vitaminreiche Früchte, braucht kalkhaltigen Boden."
+    },
+    "hosta": {
+        "de": "Funkie", "lat": "Hosta",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "gering",
+        "note": "Königin der Schattenpflanzen, schneckenanfällig."
+    },
+    "hydrangea_arborescens": {
+        "de": "Wald-Hortensie", "lat": "Hydrangea arborescens",
+        "needs_acid_soil": True, "wind_resistence": "mittel", "drought_tolerance": "gering",
+        "note": "Sorte 'Annabelle' ist sehr beliebt, braucht viel Wasser."
+    },
+    "hydrangea_macrophylla": {
+        "de": "Bauernhortensie", "lat": "Hydrangea macrophylla",
+        "needs_acid_soil": True, "wind_resistence": "mittel", "drought_tolerance": "gering",
+        "note": "Klassische Hortensie, braucht Winterschutz."
+    },
+    "hydrangea_paniculata": {
+        "de": "Rispenhortensie", "lat": "Hydrangea paniculata",
+        "needs_acid_soil": True, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Viel sonnenverträglicher als andere Hortensien."
+    },
+    "iberis_sempervirens": {
+        "de": "Schleifenblume", "lat": "Iberis sempervirens",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Immergrüner Kissenbildner."
+    },
+    "ilex_aquifolium": {
+        "de": "Europäische Stechpalme", "lat": "Ilex aquifolium", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "restriction": "Giftige Beeren, stachelige Blätter."
+    },
+    "ilex_crenata": {
+        "de": "Japanische Stechpalme", "lat": "Ilex crenata",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Bester Ersatz für Buchsbaum."
+    },
+    "iris_barbata": {
+        "de": "Schwertlilie", "lat": "Iris barbata",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Braucht vollsonnige Plätze und trockene Rhizome."
+    },
+    "juglans_regia": {
+        "de": "Echte Walnuss", "lat": "Juglans regia", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Großer Schattenbaum mit Nutzwert."
+    },
+    "kniphofia": {
+        "de": "Fackellilie", "lat": "Kniphofia",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Exotische Optik, braucht Winterschutz bei Staunässe."
+    },
+    "lavandula_angustifolia": {
+        "de": "Lavendel", "lat": "Lavandula angustifolia",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Braucht kargen Boden und jährlichen Rückschnitt."
+    },
+    "leontopodium_alpinum": {
+        "de": "Edelweiß", "lat": "Leontopodium alpinum", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Symbolpflanze der Alpen, braucht Kalkschotter."
+    },
+    "leucanthemum_superbum": {
+        "de": "Garten-Margerite", "lat": "Leucanthemum x superbum",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Klassiker für den Bauerngarten."
+    },
+    "ligustrum_vulgare": {
+        "de": "Liguster", "lat": "Ligustrum vulgare", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Besonders robust, ökologisch wertvoll."
+    },
+    "liquidambar_styraciflua": {
+        "de": "Amberbaum", "lat": "Liquidambar styraciflua",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Beste Herbstfärbung im Sortiment."
+    },
+    "lonicera_nitida": {
+        "de": "Immergrüne Heckenkirsche", "lat": "Lonicera nitida",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Sehr schnittverträglicher, niedriger Heckenersatz."
+    },
+    "lonicera_pileata": {
+        "de": "Heckenmyrte", "lat": "Lonicera pileata",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Robuster Bodendecker, auch für Böschungen."
+    },
+    "lupinus": {
+        "de": "Lupine", "lat": "Lupinus",
+        "needs_acid_soil": True, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Stickstoffsammler, verbessert den Boden."
+    },
+    "magnolia_stellata": {
+        "de": "Stern-Magnolie", "lat": "Magnolia stellata",
+        "needs_acid_soil": True, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Früheste Magnolie, bleibt kompakt."
+    },
+    "magnolia_soulangeana": {
+        "de": "Tulpen-Magnolie", "lat": "Magnolia x soulangeana",
+        "needs_acid_soil": True, "wind_resistence": "gering", "drought_tolerance": "mittel",
+        "note": "Prachtvoller Solitärbaum."
+    },
+    "malus": {
+        "de": "Zierapfel", "lat": "Malus", "fire_blight_risk": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Überreiche Blüte und kleiner Fruchtschmuck. Feuerbrand-Wirt!"
+    },
+    "malus_domestica": {
+        "de": "Säulenapfel", "lat": "Malus domestica", "fire_blight_risk": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Ideal für kleine Gärten und Kübel. Feuerbrand-Wirt!"
+    },
+    "mentha": {
+        "de": "Teppich-Minze", "lat": "Mentha",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Duftender Bodendecker, kann wuchern."
+    },
+    "nepeta_faassenii": {
+        "de": "Katzenminze", "lat": "Nepeta x faassenii",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Dauerblüher, wirkt anziehend auf Katzen."
+    },
+    "paeonia_lactiflora": {
+        "de": "Pfingstrose", "lat": "Paeonia lactiflora",
+        "needs_acid_soil": False, "wind_resistence": "gering", "drought_tolerance": "mittel",
+        "note": "Extrem langlebig, mag keine Umpflanzung."
+    },
+    "papaver_orientale": {
+        "de": "Türkenmohn", "lat": "Papaver orientale",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Zieht nach der Blüte komplett ein."
+    },
+    "parrotia_persica": {
+        "de": "Eisenholzbaum", "lat": "Parrotia persica",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Absolut klimafit, bizarre Wuchsform im Alter."
+    },
+    "parthenocissus_tricuspidata": {
+        "de": "Wilder Wein", "lat": "Parthenocissus tricuspidata",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Selbstklimmende Fassadenbegrünung."
+    },
+    "paulownia_tomentosa": {
+        "de": "Blauglockenbaum", "lat": "Paulownia tomentosa",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Extrem schnellwachsend, braucht viel Platz."
+    },
+    "perovskia_atriplicifolia": {
+        "de": "Blauraute", "lat": "Perovskia atriplicifolia",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Spätsommerblüher, sehr trockenheitsresistent."
+    },
+    "philadelphus_coronarius": {
+        "de": "Bauernjasmin", "lat": "Philadelphus coronarius",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Starker, angenehmer Duft."
+    },
+    "phlox_paniculata": {
+        "de": "Hohe Flammenblume", "lat": "Phlox paniculata",
+        "needs_acid_soil": False, "wind_resistence": "gering", "drought_tolerance": "mittel",
+        "note": "Klassische Beetstaude mit starkem Duft."
+    },
+    "phlox_subulata": {
+        "de": "Polster-Phlox", "lat": "Phlox subulata",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Farbenfroher Bodendecker für das Frühjahr."
+    },
+    "photinia_fraseri_red_robin": {
+        "de": "Glanzmispel 'Red Robin'", "lat": "Photinia x fraseri 'Red Robin'", "fire_blight_risk": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Immergrün mit leuchtend rotem Austrieb. Feuerbrand-Wirt!"
+    },
+    "physostegia_virginiana": {
+        "de": "Gelenkblume", "lat": "Physostegia virginiana",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Interessante Blütenform, sehr standfest."
+    },
+    "platycladus_orientalis": {
+        "de": "Orientalischer Lebensbaum", "lat": "Platycladus orientalis",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Hitzeverträglicher als die Thuja occidentalis."
+    },
+    "potentilla_fruticosa": {
+        "de": "Fünffingerstrauch", "lat": "Potentilla fruticosa",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Extrem lange Blütezeit, sehr pflegeleicht."
+    },
+    "prunus_armeniaca": {
+        "de": "Marille", "lat": "Prunus armeniaca",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Spätfrostgefährdet, braucht warme Standorte."
+    },
+    "prunus_avium": {
+        "de": "Säulenkirsche", "lat": "Prunus avium",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Platzsparender Obstbaum."
+    },
+    "prunus_domestica": {
+        "de": "Hauszwetschke", "lat": "Prunus domestica", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Traditionelles österreichisches Obstgehölz."
+    },
+    "prunus_laurocerasus": {
+        "de": "Kirschlorbeer", "lat": "Prunus laurocerasus",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "restriction": "Giftig, breitet sich in Wäldern aus (problematisch)."
+    },
+    "prunus_lusitanica": {
+        "de": "Portugiesischer Kirschlorbeer", "lat": "Prunus lusitanica",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Hitzefester und eleganter als der herkömmliche Kirschlorbeer."
+    },
+    "prunus_serrulata": {
+        "de": "Japanische Zierkirsche", "lat": "Prunus serrulata",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Symbol für den Frühling, keine essbaren Früchte."
+    },
+    "prunus_spinosa": {
+        "de": "Schlehe", "lat": "Prunus spinosa", "native": True, "fire_blight_risk": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Dornig, wertvoll für Vögel. Feuerbrand-Wirt!"
+    },
+    "pulsatilla_vulgaris": {
+        "de": "Küchenschelle", "lat": "Pulsatilla vulgaris", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "restriction": "Giftig. Steht unter Naturschutz."
+    },
+    "pyracantha_coccinea": {
+        "de": "Feuerdorn", "lat": "Pyracantha coccinea", "fire_blight_risk": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Immergrün, dornig, bunter Fruchtschmuck. Feuerbrand-Wirt!"
+    },
+    "rhododendron": {
+        "de": "Rhododendron", "lat": "Rhododendron",
+        "needs_acid_soil": True, "wind_resistence": "mittel", "drought_tolerance": "gering",
+        "note": "Braucht saures Moorbeet (pH 4-5)."
+    },
+    "ribes_alpinum": {
+        "de": "Alpen-Johannisbeere", "lat": "Ribes alpinum", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Sehr schattenverträglich."
+    },
+    "ribes_idaeus": {
+        "de": "Himbeere", "lat": "Ribes idaeus", "native": True,
+        "needs_acid_soil": True, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Ernte von Sommer bis Herbst je nach Sorte."
+    },
+    "ribes_sanguineum": {
+        "de": "Blut-Johannisbeere", "lat": "Ribes sanguineum",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Reiner Zierstrauch mit prächtiger Blüte."
+    },
+    "rosa": {
+        "de": "Strauchrose", "lat": "Rosa", "fire_blight_risk": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Auf ADR-Prädikat achten. Feuerbrand-Wirt!"
+    },
+    "rosa_canina": {
+        "de": "Hundsrose", "lat": "Rosa canina", "native": True, "fire_blight_risk": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Wichtige Hagebutten-Quelle. Feuerbrand-Wirt!"
+    },
+    "rubus_sectio_rubus": {
+        "de": "Brombeere", "lat": "Rubus sectio Rubus", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Wüchsig, braucht Rankhilfe."
+    },
+    "salix_alba_tristis": {
+        "de": "Trauerweide", "lat": "Salix alba 'Tristis'", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "gering",
+        "note": "Braucht viel Platz und Wassernähe."
+    },
+    "salix_purpurea": {
+        "de": "Purpur-Weide", "lat": "Salix purpurea", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Bienenweide, sehr gut für Uferbefestigung."
+    },
+    "salvia_nemorosa": {
+        "de": "Gartensalbei", "lat": "Salvia nemorosa",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Absoluter Insektenmagnet, Rückschnitt nach erster Blüte."
+    },
+    "sambucus_nigra": {
+        "de": "Schwarzer Holunder", "lat": "Sambucus nigra", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Blüten und Beeren sind vielseitig nutzbar."
+    },
+    "sedum": {
+        "de": "Fetthenne", "lat": "Sedum",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Überlebt extreme Trockenheit auf Dächern und Mauern."
+    },
+    "sedum_telephium": {
+        "de": "Hohe Fetthenne", "lat": "Sedum telephium",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Wichtige Nahrungsquelle für späte Schmetterlinge."
+    },
+    "solidago": {
+        "de": "Goldrute", "lat": "Solidago",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Spätblühend, ökologisch wertvoll aber teils invasiv."
+    },
+    "spiraea_vanhouttei": {
+        "de": "Prachtspiere", "lat": "Spiraea x vanhouttei", "fire_blight_risk": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Schneeweiße Blütenkaskaden im Mai. Feuerbrand-Wirt!"
+    },
+    "stachys_byzantina": {
+        "de": "Woll-Ziest", "lat": "Stachys byzantina",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Kuschelig weiches Laub, sehr trockenresistent."
+    },
+    "syringa_meyeri": {
+        "de": "Zwerg-Flieder", "lat": "Syringa meyeri",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Perfekt für kleine Gärten und Kübel."
+    },
+    "syringa_vulgaris": {
+        "de": "Edelflieder", "lat": "Syringa vulgaris",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Der klassische Duftstrauch Mai-Juni."
+    },
+    "taxus_baccata": {
+        "de": "Eibe", "lat": "Taxus baccata", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "restriction": "Ganze Pflanze (außer Samenmantel) EXTREM GIFTIG."
+    },
+    "taxus_baccata_fastigiata": {
+        "de": "Säuleneibe", "lat": "Taxus baccata 'Fastigiata'",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Langsam wachsend, sehr langlebig."
+    },
+    "thuja_brabant": {
+        "de": "Abendländischer Lebensbaum 'Brabant'", "lat": "Thuja occidentalis 'Brabant'",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "gering",
+        "restriction": "Schnellwachsend, hoher Wasserbedarf."
+    },
+    "thuja_smaragd": {
+        "de": "Smaragd-Thuja", "lat": "Thuja occidentalis 'Smaragd'",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "gering",
+        "restriction": "Ökologisch geringer Wert, Staunässe-empfindlich."
+    },
+    "tilia_cordata": {
+        "de": "Winterlinde", "lat": "Tilia cordata", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Wertvollster Bienenbaum im Sommer."
+    },
+    "vaccinium_corymbosum": {
+        "de": "Kulturheidelbeere", "lat": "Vaccinium corymbosum", "needs_acid_soil": True,
+        "wind_resistence": "mittel", "drought_tolerance": "gering",
+        "note": "Braucht unbedingt Moorbeeterde."
+    },
+    "verbascum": {
+        "de": "Königskerze", "lat": "Verbascum", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Zweijährig, sät sich gerne selbst aus."
+    },
+    "viburnum_lantana": {
+        "de": "Wolliger Schneeball", "lat": "Viburnum lantana", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Sehr trockenheitsresistent."
+    },
+    "viburnum_opulus": {
+        "de": "Gewöhnlicher Schneeball", "lat": "Viburnum opulus", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "gering",
+        "note": "Liebt feuchtere Standorte."
+    },
+    "vinca_minor": {
+        "de": "Immergrün", "lat": "Vinca minor", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Anspruchsloser Bodendecker für Halbschatten."
+    },
+    "viola_odorata": {
+        "de": "Duftveilchen", "lat": "Viola odorata", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Verbreitet sich durch Ameisen im Garten."
+    },
+    "waldsteinia_ternata": {
+        "de": "Golderdbeere", "lat": "Waldsteinia ternata",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Dichter, robuster Bodendecker, blüht gelb."
+    },
+    "weigela_florida": {
+        "de": "Weigelie", "lat": "Weigela florida",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Blütenwunder im Vorsommer."
+    },
+    "wisteria_sinensis": {
+        "de": "Blauregen", "lat": "Wisteria sinensis",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "restriction": "Starker Schlinger, braucht sehr stabile Kletterhilfen."
+    },
+    "quercus_robur": {
+        "de": "Stieleiche", "lat": "Quercus robur", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Tiefwurzler, extrem windfest, ökologisch unersetzbar."
+    },
+    "celtis_australis": {
+        "de": "Südlicher Zürgelbaum", "lat": "Celtis australis",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Der ultimative Klimabaum für die Stadt, sehr hitzefest."
+    },
+    "gleditsia_triacanthos": {
+        "de": "Lederhülsenbaum", "lat": "Gleditsia triacanthos",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Filigranes Laub, extrem trockenheitsverträglich."
+    },
+    "sorbus_aria": {
+        "de": "Echte Mehlbeere", "lat": "Sorbus aria", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Heimisch, sehr robust gegen Wind und Trockenheit."
+    },
+    "ostrya_carpinifolia": {
+        "de": "Europäische Hopfenbuche", "lat": "Ostrya carpinifolia", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Hopfenförmige Früchte, sehr robust gegen Trockenheit."
+    },
+    "quercus_phellos": {
+        "de": "Weidenblättrige Eiche", "lat": "Quercus phellos",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Filigranes Laub, sehr widerstandsfähig."
+    },
+    "sophora_japonica": {
+        "de": "Japanischer Schnurbaum", "lat": "Sophora japonica",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Wunderschöne Spätblüte im August, Bienenweide."
+    },
+    "tetradium_daniellii": {
+        "de": "Bienenbaum / Samtesche", "lat": "Tetradium daniellii",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "mittel",
+        "note": "Die ultimative Bienenweide im Spätsommer."
+    },
+    "tilia_tomentosa": {
+        "de": "Silber-Linde", "lat": "Tilia tomentosa",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Hitzeverträglichste Linde, gut gegen Blattläuse."
+    },
+    "ulmus_resista": {
+        "de": "Resista-Ulme", "lat": "Ulmus 'Resista'",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Resistent gegen das Ulmensterben, sehr windfest."
+    },
+    "zelkova_serrata": {
+        "de": "Japanische Zelkove", "lat": "Zelkova serrata",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "note": "Schöner Ersatz für die Ulme, tolle Rinde."
+    },
+    "cornus_kousa_chinensis": {
+        "de": "Chinesischer Blumenhartriegel", "lat": "Cornus kousa var. chinensis",
+        "needs_acid_soil": True, "wind_resistence": "gering", "drought_tolerance": "mittel",
+        "note": "Große weiße Brakteen, essbare Früchte."
+    },
+    "parrotia_persica_vanessa": {
+        "de": "Säulen-Eisenholzbaum", "lat": "Parrotia persica 'Vanessa'",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Schmaler Wuchs, extrem klimaresistent."
+    },
+    "fraxinus_ornus": {
+        "de": "Manna-Esche / Blumen-Esche", "lat": "Fraxinus ornus", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Duftende weiße Blüten, sehr trockenheitsresistent."
+    },
+    "corylus_colurna": {
+        "de": "Baum-Hasel", "lat": "Corylus colurna", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Sehr tiefe Wurzeln, extrem standfest bei Sturm."
+    },
+    "pinus_sylvestris": {
+        "de": "Waldkiefer / Föhre", "lat": "Pinus sylvestris", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Heimisch, kommt mit kargsten Böden zurecht."
+    },
+    "juniperus_communis": {
+        "de": "Gemeiner Wacholder", "lat": "Juniperus communis", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Immergrün, heimisch, sehr robust."
+    },
+    "sorbus_torminalis": {
+        "de": "Elsbeere", "lat": "Sorbus torminalis", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Kostbares Holz, ökologisch wertvoll, klimafit."
+    },
+    "rhus_typhina": {
+        "de": "Essigbaum", "lat": "Rhus typhina",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Wunderschöne Färbung, Achtung: bildet Ausläufer!"
+    },
+    "hippophae_rhamnoides_pollmix": {
+        "de": "Sanddorn (männlich)", "lat": "Hippophae rhamnoides 'Pollmix'", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "extrem", "drought_tolerance": "hoch",
+        "note": "Bester Befruchter, extrem windfest (Dünenpflanze)."
+    },
+    "tamarix_tetrandra": {
+        "de": "Frühlings-Tamariske", "lat": "Tamarix tetrandra",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Filigraner Wuchs, salzverträglich, sehr hitzefest."
+    },
+    "buddleja_alternifolia": {
+        "de": "Hänge-Sommerflieder", "lat": "Buddleja alternifolia",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Frosthärter als der normale Sommerflieder."
+    },
+    "koelreuteria_paniculata": {
+        "de": "Blasenbaum", "lat": "Koelreuteria paniculata",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Gelbe Blüten im Juli, sehr dekorative Blasenfrüchte."
+    },
+    "gymnocladus_dioicus": {
+        "de": "Geweihbaum", "lat": "Gymnocladus dioicus",
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Bizarre Wintergestalt, sehr robuster Stadtbaum."
+    },
+    "catalpa_bignonioides": {
+        "de": "Gewöhnlicher Trompetenbaum", "lat": "Catalpa bignonioides",
+        "needs_acid_soil": False, "wind_resistence": "gering", "drought_tolerance": "mittel",
+        "note": "Große blätter (Windfang!), schöne Blüte."
+    },
+    "morus_alba": {
+        "de": "Weiße Maulbeere", "lat": "Morus alba",
+        "needs_acid_soil": False, "wind_resistence": "mittel", "drought_tolerance": "hoch",
+        "note": "Essbare Früchte, sehr langlebig."
+    },
+    "prunus_mahaleb": {
+        "de": "Steinweichsel", "lat": "Prunus mahaleb", "native": True,
+        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "hoch",
+        "note": "Heimisch, duftende Blüten, extrem trockenheitsfest."
+    }
+}
+
+def check_plant(plant_id, is_protection_area):
+    info = PLANTS_REGISTRY.get(plant_id)
+    if not info: return "Fehler: Pflanze nicht gefunden."
+    
+    name_display = f"{info['de']} ({info['lat']})"
+    
+    # Check 1: Feuerbrand (Thuja hat kein Risiko, aber für die Logik)
+    if is_protection_area and info.get("fire_blight_risk"):
+        return f"⚠️ GEFAHR: '{name_display}' ist ein Feuerbrand-Wirt!"
+    
+    # Check 2: Einschränkungen/Hinweise
+    if "restriction" in info:
+        return f"ℹ️ INFO: {info['restriction']}"
+        
+    return f"✅ OK: {info.get('note', 'Für diesen Standort geeignet.')}"
+
+def get_restricted_plants(is_protection_area):
+    res = []
+    for p_id, info in PLANTS_REGISTRY.items():
+        if (is_protection_area and info.get("fire_blight_risk")) or "restriction" in info:
+            res.append(f"- {info['de']} ({info['lat']})")
+    return res

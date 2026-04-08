@@ -1,0 +1,13 @@
+# Geheime Schlüssel und Token
+client_secrets.json
+credentials.json
+last_backup.txt
+
+# Große Datenbanken (die liegen ja sicher im Google Drive)
+*.db
+*.json
+!plants_data.json # (Nur falls dein Lexikon als JSON vorliegt, sonst weglassen)
+
+# Python-Müll
+__pycache__/
+.streamlit/
