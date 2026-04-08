@@ -74,42 +74,43 @@ import history_module
 
 # --- 4. BACKUP-LOGIK (UPLOAD) ---
 def upload_all_to_drive():
-    """Synchronisiert alle wichtigen Daten und verhindert Duplikate."""
+    """Synchronisiert Daten und erzwingt ein dauerhaftes Ticket für die Cloud."""
     try:
         gauth = GoogleAuth()
         if IS_LOCAL:
-            gauth.LocalWebserverAuth()
+            # Erzwingt, dass Google uns ein Refresh-Token gibt
+            gauth.LocalWebserverAuth(auth_params={'access_type': 'offline', 'approval_prompt': 'force'})
+            gauth.SaveCredentialsFile("credentials.json")
         else:
             gauth.LoadCredentialsFile("credentials.json")
+            if gauth.access_token_expired:
+                gauth.Refresh()
+            else:
+                gauth.Authorize()
             
         drive = GoogleDrive(gauth)
 
+        # (Der restliche Upload-Teil bleibt gleich...)
         files_to_sync = {
             "boden_austria_backup.db": DB_PATH,
             "ebod_atlas_backup.json": ATLAS_PATH,
-            "environment_history_backup.json": ENV_PATH,
-            "official_restrictions_backup.csv": r'E:\Database\official_restrictions.csv' if IS_LOCAL else None
+            "environment_history_backup.json": ENV_PATH
         }
 
         for title, local_path in files_to_sync.items():
-            if local_path is None or not os.path.exists(local_path):
-                continue
-            
+            if not os.path.exists(local_path): continue
             query = f"title = '{title}' and trashed = false"
             file_list = drive.ListFile({'q': query}).GetList()
-            
             file_drive = file_list[0] if file_list else drive.CreateFile({'title': title})
             file_drive.SetContentFile(local_path)
             file_drive.Upload()
         
-        # Zeitstempel speichern
-        current_time = pd.Timestamp.now().strftime('%d.%m.%Y %H:%M:%S')
         with open(BACKUP_INFO_PATH, 'w') as f:
-            f.write(current_time)
+            f.write(pd.Timestamp.now().strftime('%d.%m.%Y %H:%M:%S'))
             
-        return True, "Alle Systeme sind jetzt in der Cloud auf dem neuesten Stand."
+        return True, "Ticket erneuert und Backup erstellt!"
     except Exception as e:
-        return False, f"Synchronisations-Fehler: {str(e)}"
+        return False, f"Fehler: {str(e)}"
 
 # --- 5. LOGIK-FUNKTIONEN ---
 def get_soil_status(plz_input):
