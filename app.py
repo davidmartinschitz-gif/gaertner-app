@@ -43,6 +43,8 @@ def sync_from_drive():
             gauth.Refresh()
         else:
             gauth.Authorize()
+
+        gauth.SaveCredentialsFile("credentials.json")
         
         drive = GoogleDrive(gauth)
         
