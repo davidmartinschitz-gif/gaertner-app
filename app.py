@@ -4,75 +4,113 @@ import os
 import pandas as pd
 import difflib
 import json
-
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 
+# --- 1. HYBRID-PFAD-LOGIK ---
+# Prüfen, ob wir lokal auf dem PC arbeiten oder in der Cloud
+IS_LOCAL = os.path.exists(r'E:\Database')
+
+if IS_LOCAL:
+    # Modus: Lokale Workstation (E: Laufwerk)
+    DB_PATH = r'E:\Database\boden_austria.db'
+    ATLAS_PATH = r'E:\Database\ebod_atlas.json'
+    ENV_PATH = r'E:\Database\environment_history.json'
+    BACKUP_INFO_PATH = r'E:\Database\last_backup.txt'
+else:
+    # Modus: Streamlit Cloud (Handy-Betrieb)
+    DB_PATH = 'boden_austria_backup.db'
+    ATLAS_PATH = 'ebod_atlas_backup.json'
+    ENV_PATH = 'environment_history_backup.json'
+    BACKUP_INFO_PATH = 'last_backup.txt'
+
+# --- 2. CLOUD-SYNCHRONISIERUNG (DOWNLOAD) ---
+def sync_from_drive():
+    """Lädt die Dateien aus Google Drive in den Cloud-Speicher der App."""
+    if IS_LOCAL:
+        return True
+    
+    try:
+        # Client Secrets aus Streamlit Secrets erstellen
+        if not os.path.exists("client_secrets.json"):
+            with open("client_secrets.json", "w") as f:
+                f.write(st.secrets["google_drive"]["client_secrets"])
+        
+        gauth = GoogleAuth()
+        # Automatisierte Anmeldung in der Cloud via credentials.json
+        gauth.LoadCredentialsFile("credentials.json")
+        if gauth.access_token_expired:
+            gauth.Refresh()
+        else:
+            gauth.Authorize()
+        
+        drive = GoogleDrive(gauth)
+        
+        # Dateien zum Herunterladen
+        files = {
+            "boden_austria_backup.db": DB_PATH,
+            "ebod_atlas_backup.json": ATLAS_PATH,
+            "environment_history_backup.json": ENV_PATH
+        }
+        
+        for title, target in files.items():
+            file_list = drive.ListFile({'q': f"title = '{title}' and trashed = false"}).GetList()
+            if file_list:
+                file_list[0].GetContentFile(target)
+        return True
+    except Exception as e:
+        st.error(f"Cloud-Synchronisierungsfehler: {str(e)}")
+        return False
+
+# Initialer Sync beim Start in der Cloud
+if not IS_LOCAL:
+    sync_from_drive()
+
+# --- 3. MODULE IMPORTIEREN ---
+import plants_data
+import history_module
+
+# --- 4. BACKUP-LOGIK (UPLOAD) ---
 def upload_all_to_drive():
     """Synchronisiert alle wichtigen Daten und verhindert Duplikate."""
     try:
         gauth = GoogleAuth()
-        gauth.LocalWebserverAuth() 
+        if IS_LOCAL:
+            gauth.LocalWebserverAuth()
+        else:
+            gauth.LoadCredentialsFile("credentials.json")
+            
         drive = GoogleDrive(gauth)
 
-        # Liste aller Dateien, die ins 5-TB-Lager gehören
         files_to_sync = {
             "boden_austria_backup.db": DB_PATH,
             "ebod_atlas_backup.json": ATLAS_PATH,
-            "environment_history_backup.json": r'E:\Database\environment_history.json',
-            "official_restrictions_backup.csv": r'E:\Database\official_restrictions.csv'
+            "environment_history_backup.json": ENV_PATH,
+            "official_restrictions_backup.csv": r'E:\Database\official_restrictions.csv' if IS_LOCAL else None
         }
 
         for title, local_path in files_to_sync.items():
-            if not os.path.exists(local_path):
+            if local_path is None or not os.path.exists(local_path):
                 continue
             
-            # 🔍 Suche: Existiert diese Datei bereits im Drive?
             query = f"title = '{title}' and trashed = false"
             file_list = drive.ListFile({'q': query}).GetList()
             
-            if file_list:
-                # Falls ja: Nutze die existierende Datei (Update)
-                file_drive = file_list[0]
-                status_msg = "aktualisiert"
-            else:
-                # Falls nein: Erstelle einen neuen Eintrag
-                file_drive = drive.CreateFile({'title': title})
-                status_msg = "neu erstellt"
-            
+            file_drive = file_list[0] if file_list else drive.CreateFile({'title': title})
             file_drive.SetContentFile(local_path)
             file_drive.Upload()
-            print(f"Cloud-Sync: {title} wurde {status_msg}.")
         
-        return True, "Alle Systeme (Datenbank, eBOD, Umwelt & Recht) sind jetzt in der Cloud auf dem neuesten Stand."
+        # Zeitstempel speichern
+        current_time = pd.Timestamp.now().strftime('%d.%m.%Y %H:%M:%S')
+        with open(BACKUP_INFO_PATH, 'w') as f:
+            f.write(current_time)
+            
+        return True, "Alle Systeme sind jetzt in der Cloud auf dem neuesten Stand."
     except Exception as e:
         return False, f"Synchronisations-Fehler: {str(e)}"
 
-# --- 1. HYBRID-PFAD-LOGIK ---
-# Wir prüfen, ob dein Laufwerk E: existiert (dann sind wir bei dir zu Hause)
-IS_LOCAL = os.path.exists(r'E:\Database')
-
-if IS_LOCAL:
-    # Modus: AMD Ryzen 7 2700X Workstation
-    DB_PATH = r'E:\Database\boden_austria.db'
-    ATLAS_PATH = r'E:\Database\ebod_atlas.json'
-    # Falls history_module den Pfad braucht, definieren wir ihn hier mit
-    ENV_PATH = r'E:\Database\environment_history.json'
-else:
-    # Modus: Streamlit Cloud (Handy-Betrieb)
-    # Hier liegen die Dateien direkt im App-Ordner (heruntergeladen aus dem Drive)
-    DB_PATH = 'boden_austria_backup.db'
-    ATLAS_PATH = 'ebod_atlas_backup.json'
-    ENV_PATH = 'environment_history_backup.json'
-
-# --- 2. MODULE IMPORTIEREN ---
-import plants_data
-import history_module
-
-# --- 3. LOGIK-FUNKTIONEN ---
+# --- 5. LOGIK-FUNKTIONEN ---
 def get_soil_status(plz_input):
-    """Prüft erst eigene Daten (SSD oder Cloud-Mirror), dann den eBOD-Atlas."""
-    # Check 1: Eigene Datenbank
     if os.path.exists(DB_PATH):
         try:
             conn = sqlite3.connect(DB_PATH)
@@ -81,9 +119,8 @@ def get_soil_status(plz_input):
             if row:
                 return row[0] > 0, "Eigene Messung"
         except Exception:
-            pass # Falls die DB in der Cloud noch nicht bereit ist
+            pass
 
-    # Check 2: eBOD Atlas (JSON-Datei)
     if os.path.exists(ATLAS_PATH):
         with open(ATLAS_PATH, 'r') as f:
             atlas = json.load(f)
@@ -92,7 +129,7 @@ def get_soil_status(plz_input):
                 
     return None, "Keine Daten"
 
-# --- 4. STREAMLIT UI ---
+# --- 6. STREAMLIT UI ---
 st.set_page_config(page_title="Gärtner-Master 2026", page_icon="🌱", layout="wide")
 
 st.sidebar.title("🌿 Navigation")
@@ -102,34 +139,42 @@ if page == "Dashboard":
     st.title("🌱 Gärtner-Master Dashboard")
     st.write("Willkommen in deiner digitalen Garten-Zentrale.")
     
-    # Status-Kacheln (Jetzt mit 3 Spalten für mehr Übersicht)
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Pflanzen im Lexikon", len(plants_data.PLANTS_REGISTRY))
     with col2:
-        st.success("✅ SSD-Datenbank bereit" if os.path.exists(DB_PATH) else "⚠️ Datenbank fehlt")
+        status_text = "✅ SSD-Datenbank bereit" if IS_LOCAL else "✅ Cloud-Mirror aktiv"
+        if not os.path.exists(DB_PATH):
+            status_text = "⚠️ Datenbank fehlt"
+        st.success(status_text)
     with col3:
         st.info("☁️ Cloud-Lager: 5 TB verfügbar")
 
     st.divider()
 
-    # --- DIE CLOUD-SEKTION (Das ist der neue Teil!) ---
     st.header("💾 Cloud-Synchronisation")
     st.write("Sichere deine lokale Datenbank und den eBOD-Atlas in dein Google Drive Hauptlager.")
     
     if st.button("Jetzt Komplett-Backup auf Google Drive erstellen"):
-        with st.spinner("Alle Datenpakete werden geschnürt und synchronisiert..."):
-            erfolg, nachricht = upload_all_to_drive() # Hier den neuen Funktionsnamen nutzen
+        with st.spinner("Synchronisiere Datenpakete..."):
+            erfolg, nachricht = upload_all_to_drive()
             if erfolg:
                 st.success(nachricht)
             else:
                 st.error(nachricht)
 
+    if os.path.exists(BACKUP_INFO_PATH):
+        with open(BACKUP_INFO_PATH, 'r') as f:
+            st.caption(f"Letztes erfolgreiches Backup: {f.read()}")
+
     st.divider()
     st.subheader("System-Details")
-    st.write(f"Lokaler Pfad: `{DB_PATH}`")
+    st.write(f"Modus: {'Lokal' if IS_LOCAL else 'Cloud'}")
+    st.write(f"Daten-Pfad: `{DB_PATH}`")
     st.write(f"Prozessor: AMD Ryzen 7 2700X | Lager: Intenso SSD")
+
 elif page == "Pflanzen-Experte":
+    # (Restlicher Code für Pflanzen-Experte bleibt identisch)
     st.title("🔍 Intelligenter Pflanzen-Check")
     
     col_a, col_b = st.columns(2)
@@ -158,10 +203,8 @@ elif page == "Pflanzen-Experte":
             st.divider()
             st.subheader(f"Analyse für: {info['de']} ({info['lat']})")
             
-            # Gärtner-Notiz anzeigen
             if "note" in info:
                 st.info(f"💡 **Gärtner-Tipp:** {info['note']}")
-
             if "restriction" in info:
                 st.warning(f"⚠️ **Einschränkung:** {info['restriction']}")
 
@@ -179,51 +222,39 @@ elif page == "Pflanzen-Experte":
                 if "wind_resistence" in info:
                     has_env_data = True
                     w_res = info['wind_resistence']
-                    
                     if env['wind'] == 'stark' and w_res == 'gering':
-                        st.warning("⚠️ Zu windig für diese Sorte!")
+                        st.warning("⚠️ Zu windig!")
                     elif w_res == 'hoch':
-                        st.success("✅ Standfest bei Sturm")
+                        st.success("✅ Standfest")
                     else:
-                        # Das fängt jetzt 'mittel' ab
                         st.info(f"ℹ️ Windfestigkeit: {w_res.capitalize()}")
                 
                 if "drought_tolerance" in info:
                     has_env_data = True
                     if env['drought_years'] >= 2 and info['drought_tolerance'] == 'gering':
-                        st.warning("⚠️ Dürregefahr! Hoher Wasserbedarf.")
+                        st.warning("⚠️ Dürregefahr!")
                     elif info['drought_tolerance'] == 'hoch':
                         st.success("✅ Klimawandel-Gewinner")
 
                 if not has_env_data:
-                    st.info("ℹ️ Keine spezifischen Wind/Dürre-Daten hinterlegt.")
+                    st.info("ℹ️ Keine spezifischen Wind/Dürre-Daten.")
 
             with soil_col:
                 st.markdown("### 🧪 Boden-Passung")
                 has_lime, quelle = get_soil_status(plz)
-                
                 if has_lime is None:
-                    # Hier leuchtet es gelb, wenn keine Daten da sind
-                    st.warning(f"⚠️ Keine Bodendaten für PLZ {plz} vorhanden.")
+                    st.warning(f"⚠️ Keine Bodendaten für PLZ {plz}.")
                 else:
                     st.caption(f"Quelle: {quelle}")
                     needs_acid = info.get("needs_acid_soil", False)
-                    
-                    # Szenario 1: Pflanze braucht sauer, Boden hat Kalk
                     if needs_acid and has_lime:
-                        st.error("❌ KALK-KONFLIKT: Diese Pflanze braucht sauren Boden (pH 4-5.5). Dein Boden ist zu kalkhaltig.")
-                    
-                    # Szenario 2: Pflanze braucht sauer, Boden ist kalkfrei
+                        st.error("❌ KALK-KONFLIKT")
                     elif needs_acid and not has_lime:
-                        st.success("✅ MOORBEET-CHECK: Perfekt! Saurer Boden für Moorbeetpflanze.")
-                    
-                    # Szenario 3: Pflanze braucht KEINEN sauren Boden, Boden hat Kalk (Das ist der neue Punkt!)
+                        st.success("✅ MOORBEET-CHECK")
                     elif not needs_acid and has_lime:
-                        st.success("✅ KALK-TOLERANZ: Diese Pflanze liebt oder toleriert Kalkgehalt.")
-                    
-                    # Szenario 4: Pflanze braucht KEINEN sauren Boden, Boden ist neutral/sauer
+                        st.success("✅ KALK-TOLERANZ")
                     else:
-                        st.success("✅ BODEN-PASSUNG: Neutraler Boden ist für diese Pflanze ideal.")
+                        st.success("✅ BODEN-PASSUNG")
 
 elif page == "Boden-Verwaltung":
     st.title("📊 Boden-Datenbank")
