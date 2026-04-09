@@ -1,12 +1,22 @@
-# Geheime Schlüssel und Token
+# --- SICHERHEIT (Niemals hochladen!) ---
 credentials.json
+.env
 last_backup.txt
+client_secrets.json
 
-# Große Datenbanken (die liegen ja sicher im Google Drive)
+# --- DATENBANKEN ---
 *.db
-*.json
-!plants_data.json # (Nur falls dein Lexikon als JSON vorliegt, sonst weglassen)
+# Wir ignorieren nicht alle JSONs, sondern nur die sensiblen
+# ebod_atlas_backup.json MUSS hochgeladen werden, damit die App läuft.
+# Falls du aber eine JSON mit privaten Notizen hast, füge sie hier einzeln ein.
 
-# Python-Müll
+# --- PYTHON & TOOLS ---
 __pycache__/
-.streamlit/
+*.py[cod]
+.streamlit/config.toml
+# Die secrets.toml ignorieren wir, da wir die Secrets direkt in Streamlit Cloud eingeben
+.streamlit/secrets.toml
+
+# --- GEHÄUSE & BETRIEBSSYSTEM ---
+.DS_Store
+Thumbs.db

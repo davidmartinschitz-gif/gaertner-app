@@ -46,31 +46,47 @@ else:
     BACKUP_INFO_PATH = "last_backup.txt"
 
 
-# --- 2. CLOUD-SYNCHRONISIERUNG (DOWNLOAD) ---
-def sync_from_drive():
-    """Lädt die Dateien aus Google Drive in den Cloud-Speicher der App."""
-    if IS_LOCAL:
-        return True
+# --- 1. HELFER: GOOGLE DRIVE VERBINDUNG ---
+def get_drive_instance():
+    """Erstellt eine Google Drive Verbindung für Lokal oder Cloud."""
+    gauth = GoogleAuth()
 
-    try:
-        # Client Secrets aus Streamlit Secrets erstellen
-        if not os.path.exists("client_secrets.json"):
+    if IS_LOCAL:
+        # Lokal: Nutze deine Dateien auf der SSD
+        gauth.LoadClientConfigFile("client_secrets.json")
+        gauth.LocalWebserverAuth()
+        gauth.SaveCredentialsFile("credentials.json")
+    else:
+        # Cloud: Nutze die Daten aus dem Streamlit-Tresor
+        if "google_drive" in st.secrets:
             with open("client_secrets.json", "w") as f:
                 f.write(st.secrets["google_drive"]["client_secrets"])
+            gauth.LoadClientConfigFile("client_secrets.json")
 
-        gauth = GoogleAuth()
-        # Automatisierte Anmeldung in der Cloud via credentials.json
-        gauth.LoadCredentialsFile("credentials.json")
-        if gauth.access_token_expired:
-            gauth.Refresh()
+            from oauth2client.client import GoogleCredentials
+
+            gauth.credentials = GoogleCredentials.from_json(
+                st.secrets["google_drive"]["credentials"]
+            )
         else:
-            gauth.Authorize()
+            st.error("Google Drive Secrets fehlen in Streamlit Cloud!")
+            return None
 
-        gauth.SaveCredentialsFile("credentials.json")
+    return GoogleDrive(gauth)
 
-        drive = GoogleDrive(gauth)
 
-        # Dateien zum Herunterladen
+# --- 2. MODULE & INITIALER SYNC ---
+import plants_data
+import history_module
+
+
+def sync_from_drive():
+    """Lädt die neuesten Daten aus der Cloud auf den PC/Server."""
+    try:
+        drive = get_drive_instance()
+        if not drive:
+            return False
+
         files = {
             "boden_austria_backup.db": DB_PATH,
             "ebod_atlas_backup.json": ATLAS_PATH,
@@ -85,52 +101,23 @@ def sync_from_drive():
                 file_list[0].GetContentFile(target)
         return True
     except Exception as e:
-        st.error(f"Cloud-Synchronisierungsfehler: {str(e)}")
+        st.error(f"Download-Fehler: {e}")
         return False
 
 
-# Initialer Sync beim Start in der Cloud
+# Automatischer Start-Sync in der Cloud
 if not IS_LOCAL:
     sync_from_drive()
 
-# --- 3. MODULE IMPORTIEREN ---
-import plants_data
-import history_module
 
-
-# --- 4. BACKUP-LOGIK (UPLOAD) ---
+# --- 3. BACKUP-LOGIK (UPLOAD) ---
 def upload_all_to_drive():
+    """Sichert den aktuellen Stand vom PC/Handy in die Google Cloud."""
     try:
-        gauth = GoogleAuth()
-        gauth.LoadClientConfigFile("client_secrets.json")
+        drive = get_drive_instance()
+        if not drive:
+            return False, "Kein Zugriff auf Google Drive"
 
-        if IS_LOCAL:
-            # --- DER FORCIERTE MODUS ---
-            gauth.GetFlow()
-            gauth.flow.params.update({"access_type": "offline"})
-            gauth.flow.params.update({"approval_prompt": "force"})
-            # ---------------------------
-            gauth.LocalWebserverAuth()
-            gauth.SaveCredentialsFile("credentials.json")
-        else:
-            gauth.LoadCredentialsFile("credentials.json")
-        # ----------------------------------------------------------
-
-        if IS_LOCAL:
-            # Wir nutzen den Standard-Befehl ohne die zusätzlichen Parameter
-            gauth.LocalWebserverAuth()
-            gauth.SaveCredentialsFile("credentials.json")
-        else:
-            # (Rest bleibt gleich...)
-            gauth.LoadCredentialsFile("credentials.json")
-            if gauth.access_token_expired:
-                gauth.Refresh()
-            else:
-                gauth.Authorize()
-
-        drive = GoogleDrive(gauth)
-
-        # (Der restliche Upload-Teil bleibt gleich...)
         files_to_sync = {
             "boden_austria_backup.db": DB_PATH,
             "ebod_atlas_backup.json": ATLAS_PATH,
@@ -140,20 +127,25 @@ def upload_all_to_drive():
         for title, local_path in files_to_sync.items():
             if not os.path.exists(local_path):
                 continue
+
             query = f"title = '{title}' and trashed = false"
             file_list = drive.ListFile({"q": query}).GetList()
+
+            # Entweder existierende Datei updaten oder neue erstellen
             file_drive = (
                 file_list[0] if file_list else drive.CreateFile({"title": title})
             )
             file_drive.SetContentFile(local_path)
             file_drive.Upload()
 
+        # Zeitstempel für das UI speichern
         with open(BACKUP_INFO_PATH, "w") as f:
             f.write(pd.Timestamp.now().strftime("%d.%m.%Y %H:%M:%S"))
 
-        return True, "Ticket erneuert und Backup erstellt!"
+        return True, "Cloud-Backup erfolgreich erstellt!"
+
     except Exception as e:
-        return False, f"Fehler: {str(e)}"
+        return False, f"Fehler beim Upload: {str(e)}"
 
 
 # --- 5. LOGIK-FUNKTIONEN ---
@@ -278,47 +270,47 @@ elif page == "Pflanzen-Experte":
 
                 # --- SPALTE 2: UMWELT ---
                 # --- SPALTE 2: UMWELT & KLIMA ---
-                with env_col:
-                    st.markdown("### 💨 Umwelt & Klima")
+            with env_col:
+                st.markdown("### 💨 Umwelt & Klima")
 
-                    # 1. Wetter-Historie für die PLZ abrufen
-                    try:
-                        env = history_module.get_environmental_history(plz)
-                        has_env_data = False
+                # 1. Wetter-Historie für die PLZ abrufen
+                try:
+                    env = history_module.get_environmental_history(plz)
+                    has_env_data = False
 
-                        # Wind-Check
-                        if "wind_resistence" in info:
-                            has_env_data = True
-                            w_res = info["wind_resistence"]
-                            if env["wind"] == "stark" and w_res == "gering":
-                                st.warning("⚠️ Zu windig für diese Art!")
-                            elif w_res == "hoch":
-                                st.success("✅ Windfest")
-                            else:
-                                st.info(f"ℹ️ Windfestigkeit: {w_res.capitalize()}")
+                    # Wind-Check
+                    if "wind_resistence" in info:
+                        has_env_data = True
+                        w_res = info["wind_resistence"]
+                        if env["wind"] == "stark" and w_res == "gering":
+                            st.warning("⚠️ Zu windig für diese Art!")
+                        elif w_res == "hoch":
+                            st.success("✅ Windfest")
+                        else:
+                            st.info(f"ℹ️ Windfestigkeit: {w_res.capitalize()}")
 
-                        # Dürre-Check
-                        if "drought_tolerance" in info:
-                            has_env_data = True
-                            d_tol = info["drought_tolerance"]
-                            if env["drought_years"] >= 2 and d_tol == "gering":
-                                st.warning("⚠️ Dürregefahr an diesem Standort!")
-                            elif d_tol == "hoch":
-                                st.success("✅ Klimawandel-Gewinner")
-                            else:
-                                st.info(f"ℹ️ Dürretoleranz: {d_tol.capitalize()}")
+                    # Dürre-Check
+                    if "drought_tolerance" in info:
+                        has_env_data = True
+                        d_tol = info["drought_tolerance"]
+                        if env["drought_years"] >= 2 and d_tol == "gering":
+                            st.warning("⚠️ Dürregefahr an diesem Standort!")
+                        elif d_tol == "hoch":
+                            st.success("✅ Klimawandel-Gewinner")
+                        else:
+                            st.info(f"ℹ️ Dürretoleranz: {d_tol.capitalize()}")
 
-                        # Falls gar nichts in der Datenbank steht:
-                        if not has_env_data:
-                            st.info(
-                                "ℹ️ Keine spezifischen Wind- oder Dürredaten für Malus hinterlegt."
-                            )
-                            st.caption(
-                                f"Wetter-Trend für {plz}: {env['wind'].capitalize()}er Wind, {env['drought_years']} Dürrejahre."
-                            )
+                    # Falls gar nichts in der Datenbank steht:
+                    if not has_env_data:
+                        st.info(
+                            "ℹ️ Keine spezifischen Wind- oder Dürredaten für Malus hinterlegt."
+                        )
+                        st.caption(
+                            f"Wetter-Trend für {plz}: {env['wind'].capitalize()}er Wind, {env['drought_years']} Dürrejahre."
+                        )
 
-                    except Exception as e:
-                        st.error("Wetterdaten konnten nicht geladen werden.")
+                except Exception as e:
+                    st.error("Wetterdaten konnten nicht geladen werden.")
 
             # --- SPALTE 3: BODEN (Hybrid-Logik) ---
             with soil_col:
