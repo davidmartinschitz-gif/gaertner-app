@@ -74,14 +74,28 @@ import history_module
 
 # --- 4. BACKUP-LOGIK (UPLOAD) ---
 def upload_all_to_drive():
-    """Synchronisiert Daten und erzwingt ein dauerhaftes Ticket für die Cloud."""
     try:
         gauth = GoogleAuth()
+        gauth.LoadClientConfigFile("client_secrets.json")
+        
         if IS_LOCAL:
-            # Erzwingt, dass Google uns ein Refresh-Token gibt
-            gauth.LocalWebserverAuth(auth_params={'access_type': 'offline', 'approval_prompt': 'force'})
+            # --- DER FORCIERTE MODUS ---
+            gauth.GetFlow()
+            gauth.flow.params.update({'access_type': 'offline'})
+            gauth.flow.params.update({'approval_prompt': 'force'})
+            # ---------------------------
+            gauth.LocalWebserverAuth() 
             gauth.SaveCredentialsFile("credentials.json")
         else:
+            gauth.LoadCredentialsFile("credentials.json")
+        # ----------------------------------------------------------
+
+        if IS_LOCAL:
+            # Wir nutzen den Standard-Befehl ohne die zusätzlichen Parameter
+            gauth.LocalWebserverAuth() 
+            gauth.SaveCredentialsFile("credentials.json")
+        else:
+            # (Rest bleibt gleich...)
             gauth.LoadCredentialsFile("credentials.json")
             if gauth.access_token_expired:
                 gauth.Refresh()
