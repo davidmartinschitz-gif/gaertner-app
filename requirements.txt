@@ -1,3 +1,7 @@
 streamlit
 pandas
 pydrive2
+folium
+streamlit-folium
+streamlit-js-eval
+h3
