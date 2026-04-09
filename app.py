@@ -15,18 +15,16 @@ import h3
 
 current_hex = h3.latlng_to_cell(lat_now, lon_now, 11)
 
-# 2. JSON-Datenbank laden
+# 2. JSON-Datenbank sicher laden
+ebod_db = {}
 if os.path.exists("ebod_atlas_backup.json"):
-    with open("ebod_atlas_backup.json", "r", encoding="utf-8") as f:
-        ebod_db = json.load(f)
-else:
-    ebod_db = {}
-
-# 3. Aktuellen Boden-Status im Session State speichern
-if current_hex in ebod_db:
-    st.session_state.active_soil = ebod_db[current_hex]
-else:
-    st.session_state.active_soil = None
+    try:
+        with open("ebod_atlas_backup.json", "r", encoding="utf-8") as f:
+            content = f.read()
+            if content.strip():  # Prüfen, ob die Datei nicht leer ist
+                ebod_db = json.loads(content)
+    except Exception as e:
+        st.error(f"Boden-Datenbank konnte nicht geladen werden. Nutze leere Basis.")
 
 # --- 1. HYBRID-PFAD-LOGIK ---
 # Prüfen, ob wir lokal auf dem PC arbeiten oder in der Cloud
@@ -52,22 +50,30 @@ def get_drive_instance():
     gauth = GoogleAuth()
 
     if IS_LOCAL:
-        # Lokal: Nutze deine Dateien auf der SSD
+        # Lokal am PC: Nutze deine echten Dateien auf der SSD
         gauth.LoadClientConfigFile("client_secrets.json")
         gauth.LocalWebserverAuth()
         gauth.SaveCredentialsFile("credentials.json")
     else:
-        # Cloud: Nutze die Daten aus dem Streamlit-Tresor
+        # IN DER CLOUD: Wir erstellen temporäre Dateien aus den Secrets
         if "google_drive" in st.secrets:
+            # 1. Die client_secrets "vorgaukeln"
             with open("client_secrets.json", "w") as f:
                 f.write(st.secrets["google_drive"]["client_secrets"])
+
+            # 2. Die credentials "vorgaukeln" (behebt den _module Fehler)
+            with open("credentials.json", "w") as f:
+                f.write(st.secrets["google_drive"]["credentials"])
+
+            # Jetzt laden wir sie ganz normal, als wären sie echte Dateien
             gauth.LoadClientConfigFile("client_secrets.json")
+            gauth.LoadCredentialsFile("credentials.json")
 
-            from oauth2client.client import GoogleCredentials
-
-            gauth.credentials = GoogleCredentials.from_json(
-                st.secrets["google_drive"]["credentials"]
-            )
+            # Token auffrischen, falls nötig
+            if gauth.access_token_expired:
+                gauth.Refresh()
+            else:
+                gauth.Authorize()
         else:
             st.error("Google Drive Secrets fehlen in Streamlit Cloud!")
             return None
@@ -197,21 +203,23 @@ if page == "Dashboard":
     st.divider()
 
     st.header("💾 Cloud-Synchronisation")
-    st.write(
-        "Sichere deine lokale Datenbank und den eBOD-Atlas in dein Google Drive Hauptlager."
-    )
+    # Admin-Bereich in einem Expander verstecken
+    with st.expander("☁️ Cloud-Synchronisation & Backup"):
+        st.write(
+            "Sichere deine lokale Datenbank und den eBOD-Atlas in dein Google Drive Hauptlager."
+        )
 
-    if st.button("Jetzt Komplett-Backup auf Google Drive erstellen"):
-        with st.spinner("Synchronisiere Datenpakete..."):
-            erfolg, nachricht = upload_all_to_drive()
-            if erfolg:
-                st.success(nachricht)
-            else:
-                st.error(nachricht)
+        if st.button("Jetzt Komplett-Backup auf Google Drive erstellen"):
+            with st.spinner("Synchronisiere Datenpakete..."):
+                erfolg, nachricht = upload_all_to_drive()
+                if erfolg:
+                    st.success(nachricht)
+                else:
+                    st.error(nachricht)
 
-    if os.path.exists(BACKUP_INFO_PATH):
-        with open(BACKUP_INFO_PATH, "r") as f:
-            st.caption(f"Letztes erfolgreiches Backup: {f.read()}")
+        if os.path.exists(BACKUP_INFO_PATH):
+            with open(BACKUP_INFO_PATH, "r") as f:
+                st.caption(f"Letztes erfolgreiches Backup: {f.read()}")
 
     st.divider()
     st.subheader("System-Details")
@@ -266,8 +274,7 @@ elif page == "Pflanzen-Experte":
             # --- SPALTE 1: STANDORT ---
             with res_col:
                 st.markdown("### 📍 Standort & Recht")
-                st.write(plants_data.check_plant(p_id, True))
-
+                st.write(plants_data.check_plant(p_id, True, plz))
                 # --- SPALTE 2: UMWELT ---
                 # --- SPALTE 2: UMWELT & KLIMA ---
             with env_col:
