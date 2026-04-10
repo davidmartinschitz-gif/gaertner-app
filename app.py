@@ -209,6 +209,10 @@ def load_prohibitions_from_drive():
 # Wir laden die Verbote einmal am Anfang
 if "prohibitions" not in st.session_state:
     st.session_state["prohibitions"] = load_prohibitions_from_drive()
+# Nur zum Testen - zeigt an, wie viele Regeln geladen wurden
+st.write(
+    f"DEBUG: Register enthält {len(st.session_state.get('prohibitions', {}))} Gemeinden."
+)
 
 
 # --- DIE PRÜF-LOGIK BEIM SUCHEN ---
@@ -310,23 +314,45 @@ elif page == "Pflanzen-Experte":
 
     col_a, col_b = st.columns(2)
     with col_a:
-        plz = st.text_input("PLZ für Wetter-Check:", value="8160")
+        plz_input = st.text_input(
+            "PLZ für Wetter-Check:", value="8160", key="plz_input_experte"
+        )
+
+        # --- NEU: DIE GEMEINDE-WEICHE ---
+        ausgewaehlte_gemeinde = "Standard"
+        if plz_input in PLZ_MAPPING:
+            ausgewaehlte_gemeinde = st.selectbox(
+                f"PLZ {plz_input} ist mehrdeutig. Bitte wähle deinen Ort:",
+                options=PLZ_MAPPING[plz_input],
+                key="gemeinde_weiche_experte",
+            )
+        else:
+            st.caption(f"📍 Standort fixiert auf PLZ {plz_input}")
+
     with col_b:
-        query = st.text_input("Welche Pflanze möchtest du prüfen?").strip()
+        query = st.text_input(
+            "Welche Pflanze möchtest du prüfen?", value="Thuja"
+        ).strip()
+
+    # DEBUG INFO (Der Spion)
+    anzahl_regeln = len(st.session_state.get("prohibitions", {}))
+    st.caption(f"🛡️ Experten-Register geladen für {anzahl_regeln} Gemeinden.")
 
     if query:
-        # 1. Registry-Mapping aufbauen
-        name_to_id = {}
-        for p_id, p_info in plants_data.PLANTS_REGISTRY.items():
-            name_to_id[p_info["de"]] = p_id
-            name_to_id[p_info["lat"]] = p_id
+        # 1. Registry-Mapping
+        name_to_id = {
+            p_info["de"]: p_id for p_id, p_info in plants_data.PLANTS_REGISTRY.items()
+        }
+        name_to_id.update(
+            {
+                p_info["lat"]: p_id
+                for p_id, p_info in plants_data.PLANTS_REGISTRY.items()
+            }
+        )
 
-        # 2. Suche nach Übereinstimmungen
+        # 2. Suche
         matches = [name for name in name_to_id.keys() if query.lower() in name.lower()]
-
         if not matches:
-            import difflib
-
             matches = difflib.get_close_matches(
                 query, list(name_to_id.keys()), n=3, cutoff=0.4
             )
@@ -334,113 +360,47 @@ elif page == "Pflanzen-Experte":
         if not matches:
             st.error(f"Keine Treffer für '{query}' gefunden.")
         else:
-            # Pflanzenauswahl
-            selected_name = st.selectbox("Meintest du eine dieser Pflanzen?", matches)
+            selected_name = st.selectbox(
+                "Meintest du eine dieser Pflanzen?", matches, key="plant_select"
+            )
             p_id = name_to_id[selected_name]
-            info = plants_data.PLANTS_REGISTRY[p_id]
 
             st.divider()
-            st.subheader(f"Analyse für: {info['de']} ({info['lat']})")
 
-            if "note" in info:
-                st.info(f"💡 **Gärtner-Tipp:** {info['note']}")
-            if "restriction" in info:
-                st.warning(f"⚠️ **Einschränkung:** {info['restriction']}")
+            # --- PRIO 1: RECHTLICHER CHECK (PROHIBITIONS) ---
+            verbot = check_prohibition(ausgewaehlte_gemeinde, selected_name)
 
+            if verbot:
+                st.error(f"### 🚫 PFLANZVERBOT IN {ausgewaehlte_gemeinde.upper()}")
+                st.markdown(f"**Grund:** {verbot['grund']}")
+                st.caption(f"Quelle: {verbot['quelle']}")
+                st.warning("Dieser rechtliche Check hat Vorrang!")
+
+            # --- BOTANISCHE ANALYSE ---
+            st.subheader(f"Analyse für: {selected_name}")
             res_col, env_col, soil_col = st.columns(3)
 
-            # --- SPALTE 1: STANDORT ---
             with res_col:
                 st.markdown("### 📍 Standort & Recht")
-                st.write(plants_data.check_plant(p_id, True, plz))
-                # --- SPALTE 2: UMWELT ---
-                # --- SPALTE 2: UMWELT & KLIMA ---
+                st.write(plants_data.check_plant(p_id, True, plz_input))
+
             with env_col:
                 st.markdown("### 💨 Umwelt & Klima")
-
-                # 1. Wetter-Historie für die PLZ abrufen
                 try:
-                    env = history_module.get_environmental_history(plz)
-                    has_env_data = False
+                    env = history_module.get_environmental_history(plz_input)
+                    st.info(
+                        f"Wetter-Trend für {plz_input}: {env['wind'].capitalize()}er Wind."
+                    )
+                except:
+                    st.error("Wetterdaten nicht verfügbar.")
 
-                    # Wind-Check
-                    if "wind_resistence" in info:
-                        has_env_data = True
-                        w_res = info["wind_resistence"]
-                        if env["wind"] == "stark" and w_res == "gering":
-                            st.warning("⚠️ Zu windig für diese Art!")
-                        elif w_res == "hoch":
-                            st.success("✅ Windfest")
-                        else:
-                            st.info(f"ℹ️ Windfestigkeit: {w_res.capitalize()}")
-
-                    # Dürre-Check
-                    if "drought_tolerance" in info:
-                        has_env_data = True
-                        d_tol = info["drought_tolerance"]
-                        if env["drought_years"] >= 2 and d_tol == "gering":
-                            st.warning("⚠️ Dürregefahr an diesem Standort!")
-                        elif d_tol == "hoch":
-                            st.success("✅ Klimawandel-Gewinner")
-                        else:
-                            st.info(f"ℹ️ Dürretoleranz: {d_tol.capitalize()}")
-
-                    # Falls gar nichts in der Datenbank steht:
-                    if not has_env_data:
-                        st.info(
-                            "ℹ️ Keine spezifischen Wind- oder Dürredaten für Malus hinterlegt."
-                        )
-                        st.caption(
-                            f"Wetter-Trend für {plz}: {env['wind'].capitalize()}er Wind, {env['drought_years']} Dürrejahre."
-                        )
-
-                except Exception as e:
-                    st.error("Wetterdaten konnten nicht geladen werden.")
-
-            # --- SPALTE 3: BODEN (Hybrid-Logik) ---
             with soil_col:
                 st.markdown("### 🧪 Boden-Passung")
-                boden_typ, kalk_info, quelle_info = None, None, None
-                use_wabe = False
-
-                # Prüfen, ob wir die Wabe aus Preding nutzen
-                if "active_soil" in st.session_state and st.session_state.active_soil:
-                    if plz == "" or plz == "8160":
-                        use_wabe = True
-
-                if use_wabe:
-                    soil = st.session_state.active_soil
-                    boden_typ, kalk_info = soil["bodenart"], soil["kalk"]
-                    q_id = (
-                        st.session_state.current_hex
-                        if "current_hex" in st.session_state
-                        else "Garten"
-                    )
-                    quelle_info = f"Wabe {q_id}"
-                    st.success("📍 Waben-Daten aktiv")
-                elif plz:
-                    has_lime_plz, quelle_info = get_soil_status(plz)
-                    boden_typ = "PLZ-Schätzung"
-                    kalk_info = "Hoch" if has_lime_plz else "Niedrig"
-                    st.info(f"🔎 Schätzung für {plz}")
-
-                if boden_typ:
-                    has_lime = "Mittel" in kalk_info or "Hoch" in kalk_info
-                    needs_acid = info.get("needs_acid_soil", False)
-
-                    if needs_acid and has_lime:
-                        st.error("❌ KALK-KONFLIKT")
-                    elif needs_acid and not has_lime:
-                        st.success("✅ MOORBEET-CHECK")
-                    elif not needs_acid and has_lime:
-                        st.success("✅ KALK-TOLERANZ")
-                    else:
-                        st.success("✅ PASSEND")
-
-                    st.caption(f"Boden: {boden_typ} ({quelle_info})")
-    else:
-        # Startbildschirm, wenn noch keine Suche läuft
-        st.info("Gib oben einen Pflanzennamen ein, um die Analyse zu starten.")
+                kalk_vorhanden, quelle = get_soil_status(plz_input)
+                st.write(
+                    f"Boden-Check: {'Kalkhaltig' if kalk_vorhanden else 'Sauer/Neutral'}"
+                )
+                st.caption(f"Quelle: {quelle}")
 
 elif page == "Boden-Verwaltung":
     st.title("📊 Boden-Datenbank & Waben-Zentrale")

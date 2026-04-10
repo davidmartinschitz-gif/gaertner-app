@@ -1321,12 +1321,12 @@ def check_plant(plant_id, is_protection_area, plz=""):
     name_display = f"{info['de']} ({info['lat']})"
 
     # Check 1: Feuerbrand-Logik für Steiermark (PLZ beginnt mit 8)
-    if info.get("fire_blight_risk") and is_protection_area:
-        if plz.startswith("8"):
-            return f"🚫 PFLANZVERBOT: '{name_display}' ist in Schutzgebieten (Steiermark) laut Verordnung wegen Feuerbrand untersagt!"
+    if is_protection_area and info.get("fire_blight_risk"):
+        if str(plz).startswith("8"):
+            return f"🚫 PFLANZVERBOT: '{name_display}' ist in der Steiermark (Schutzgebiet) aufgrund von Feuerbrand untersagt!"
         return f"⚠️ GEFAHR: '{name_display}' ist ein Feuerbrand-Wirt!"
 
-    # Check 2: Einschränkungen
+    # Check 2: Einschränkungen/Hinweise
     if "restriction" in info:
         return f"ℹ️ INFO: {info['restriction']}"
 
