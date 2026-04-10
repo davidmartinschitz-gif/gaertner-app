@@ -43,6 +43,17 @@ else:
     ENV_PATH = "environment_history_backup.json"
     BACKUP_INFO_PATH = "last_backup.txt"
 
+# Automatisch generiert aus deiner PLZ-Liste
+PLZ_MAPPING = {
+    "8160": ["Mortantsch", "Naas", "Preding (Weiz)", "Weiz"],
+    "8181": ["St. Margarethen an der Raab", "St. Ruprecht an der Raab"],
+    "8044": ["Graz", "Kainbach bei Graz"],
+    "8054": ["Graz", "Haselsdorf-Tobelbad", "Seiersberg-Pirka"],
+    "8504": ["Preding", "Sankt Nikolai im Sausal"],
+    "8510": ["Marhof", "Stainz", "Stallhof"],
+    # ... du kannst die Liste aus meiner letzten Nachricht hier beliebig erweitern
+}
+
 
 # --- 1. HELFER: GOOGLE DRIVE VERBINDUNG ---
 def get_drive_instance():
@@ -50,10 +61,17 @@ def get_drive_instance():
     gauth = GoogleAuth()
 
     if IS_LOCAL:
-        # Lokal am PC: Nutze deine echten Dateien auf der SSD
+        # Lokal am PC: Nutze die echten Dateien
         gauth.LoadClientConfigFile("client_secrets.json")
-        gauth.LocalWebserverAuth()
+        # --- ANGEPASSTER LOGIN-TEIL START ---
+        gauth.GetFlow()
+        gauth.flow.params.update({"access_type": "offline"})
+        gauth.flow.params.update({"prompt": "consent"})
+        gauth.LocalWebserverAuth()  # Hier öffnet sich nun der Browser für den Login
+        # --- ANGEPASSTER LOGIN-TEIL ENDE ---
+
         gauth.SaveCredentialsFile("credentials.json")
+
     else:
         # IN DER CLOUD: Wir erstellen temporäre Dateien aus den Secrets
         if "google_drive" in st.secrets:
@@ -154,27 +172,87 @@ def upload_all_to_drive():
         return False, f"Fehler beim Upload: {str(e)}"
 
 
-# --- 5. LOGIK-FUNKTIONEN ---
+# --- 1. DATEN-BASIS (Am besten ganz oben in der Datei) ---
+PLZ_MAPPING = {
+    "8160": ["Weiz", "Mortantsch", "Naas", "Krottendorf"],
+    "8181": ["St. Ruprecht an der Raab", "St. Margarethen an der Raab"],
+    "8044": ["Graz", "Kainbach bei Graz"],
+    "8054": ["Graz", "Haselsdorf-Tobelbad", "Seiersberg-Pirka"],
+}
+
+
+# --- NEUE FUNKTION: VERBOTE AUS DRIVE LADEN ---
+def load_prohibitions_from_drive():
+    """Lädt die zentrale Verbots-Datenbank vom Google Drive."""
+    try:
+        drive = get_drive_instance()
+        if not drive:
+            return {}
+
+        # Wir suchen nach der Datei 'prohibitions.json' im Drive
+        query = "title = 'prohibitions.json' and trashed = false"
+        file_list = drive.ListFile({"q": query}).GetList()
+
+        if file_list:
+            # Datei gefunden -> Inhalt herunterladen
+            content = file_list[0].GetContentString()
+            return json.loads(content)
+        else:
+            # Falls die Datei noch nicht existiert, leeres Register zurückgeben
+            return {}
+    except Exception as e:
+        st.warning(f"Konnte Verbotsregister nicht laden: {e}")
+        return {}
+
+
+# --- IM DASHBOARD / UI-TEIL ---
+# Wir laden die Verbote einmal am Anfang
+if "prohibitions" not in st.session_state:
+    st.session_state["prohibitions"] = load_prohibitions_from_drive()
+
+
+# --- DIE PRÜF-LOGIK BEIM SUCHEN ---
+def check_prohibition(gemeinde, pflanze_suche):
+    """Prüft, ob für die Gemeinde und die Pflanze ein Verbot vorliegt."""
+    register = st.session_state.get("prohibitions", {})
+
+    if gemeinde in register:
+        gemeinde_regeln = register[gemeinde]
+        # Wir prüfen, ob ein Teil des Suchbegriffs in den verbotenen Pflanzen vorkommt
+        for verbotene_pflanze, details in gemeinde_regeln.items():
+            if verbotene_pflanze.lower() in pflanze_suche.lower():
+                return details  # Gibt Grund und Quelle zurück
+    return None
+
+
 def get_soil_status(plz_input):
+    """Prüft die Bodenwerte in DB und Atlas."""
+    # Check 1: Eigene SQL-Datenbank
     if os.path.exists(DB_PATH):
         try:
-            conn = sqlite3.connect(DB_PATH)
-            row = conn.execute(
-                "SELECT kalkgehalt FROM boden_daten WHERE plz = ?", (plz_input,)
-            ).fetchone()
-            conn.close()
-            if row:
-                return row[0] > 0, "Eigene Messung"
+            with sqlite3.connect(DB_PATH) as conn:
+                row = conn.execute(
+                    "SELECT kalkgehalt FROM boden_daten WHERE plz = ?", (plz_input,)
+                ).fetchone()
+                if row:
+                    return row[0] > 0, "Eigene Messung"
         except Exception:
             pass
 
+    # Check 2: eBOD-Atlas (JSON)
     if os.path.exists(ATLAS_PATH):
-        with open(ATLAS_PATH, "r") as f:
-            atlas = json.load(f)
-            if plz_input in atlas:
-                return atlas[plz_input] > 0, "eBOD-Prognose"
+        try:
+            with open(ATLAS_PATH, "r") as f:
+                atlas = json.load(f)
+                if plz_input in atlas:
+                    # Greift auf den Kalk-Wert im JSON zu
+                    kalk_wert = atlas[plz_input].get("kalk", 0)
+                    return kalk_wert > 0, "eBOD-Prognose"
+        except Exception:
+            pass
 
-    return None, "Keine Daten"
+    # Das return muss HIER stehen (innerhalb der Funktion, ganz am Ende)
+    return False, "Keine Daten"
 
 
 # --- 6. STREAMLIT UI ---
