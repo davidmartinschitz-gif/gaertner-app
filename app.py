@@ -4,14 +4,17 @@ import os
 import pandas as pd
 import difflib
 import json
+import time
+import h3
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
-import h3  # Falls noch nicht oben, hier einmalig ergänzen
+from streamlit_js_eval import get_geolocation
+from streamlit_folium import st_folium
+import folium
 
 # 1. Standort-Daten aus dem Gedächtnis oder Home-Base holen
 # (Nutze hier die Koordinaten, die wir für Preding fixiert haben)
 lat_now, lon_now = 47.19897, 15.64720
-import h3
 
 current_hex = h3.latlng_to_cell(lat_now, lon_now, 11)
 
@@ -43,15 +46,19 @@ else:
     ENV_PATH = "environment_history_backup.json"
     BACKUP_INFO_PATH = "last_backup.txt"
 
-# --- 1. MASTER-DATEN-BASIS (Ganz oben nach den Imports) ---
-PLZ_MAPPING = {
-    "8160": ["Mortantsch", "Naas", "Preding (Weiz)", "Weiz", "Krottendorf"],
-    "8181": ["St. Margarethen an der Raab", "St. Ruprecht an der Raab"],
-    "8044": ["Graz", "Kainbach bei Graz"],
-    "8054": ["Graz", "Haselsdorf-Tobelbad", "Seiersberg-Pirka"],
-    "8504": ["Preding", "Sankt Nikolai im Sausal"],
-    "8510": ["Marhof", "Stainz", "Stallhof"],
-}
+# --- 1. DATEN-BASIS DYNAMISCH LADEN ---
+PLZ_MAPPING = {}
+PLZ_DATEI = "plz_steiermark.json"
+
+if os.path.exists(PLZ_DATEI):
+    try:
+        with open(PLZ_DATEI, "r", encoding="utf-8") as f:
+            PLZ_MAPPING = json.load(f)
+    except Exception as e:
+        st.error(f"Fehler beim Laden der PLZ-Liste: {e}")
+else:
+    # Notfall-Fallback, falls die Datei fehlt
+    PLZ_MAPPING = {"8504": ["Preding"]}
 
 
 # --- 1. HELFER: GOOGLE DRIVE VERBINDUNG ---
@@ -215,8 +222,12 @@ def load_prohibitions_from_drive():
 if "prohibitions" not in st.session_state:
     st.session_state["prohibitions"] = load_prohibitions_from_drive()
 # Nur zum Testen - zeigt an, wie viele Regeln geladen wurden
+# Zählt die tatsächlichen Einträge im municipalities-Ordner
+prohibitions_data = st.session_state.get("prohibitions", {})
+municipalities_count = len(prohibitions_data.get("municipalities", {}))
+
 st.write(
-    f"DEBUG: Register enthält {len(st.session_state.get('prohibitions', {}))} Gemeinden."
+    f"DEBUG: Experten-Register für {municipalities_count} steirische Gemeinden aktiv."
 )
 
 
@@ -367,10 +378,6 @@ elif page == "Pflanzen-Experte":
             "Welche Pflanze möchtest du prüfen?", value="Thuja"
         ).strip()
 
-    # DEBUG INFO (Der Spion)
-    anzahl_regeln = len(st.session_state.get("prohibitions", {}))
-    st.caption(f"🛡️ Experten-Register geladen für {anzahl_regeln} Gemeinden.")
-
     if query:
         # 1. Registry-Mapping
         name_to_id = {
@@ -480,13 +487,11 @@ elif page == "Garten-Karte":
 
     # HOME-BASE als Fallback
     HOME_LAT, HOME_LON = 47.19897, 15.64720
-    from streamlit_js_eval import get_geolocation
 
     loc = None
     if get_gps:
         with st.spinner("Satelliten werden gesucht..."):
             loc = get_geolocation()
-            import time
 
             time.sleep(1.5)  # Kurze Pause für das JS-Signal
 
@@ -509,32 +514,30 @@ elif page == "Garten-Karte":
     col_map, col_data = st.columns([2, 1])
 
     with col_map:
-        import folium
-        from streamlit_folium import st_folium
 
         m = folium.Map(location=[lat, lon], zoom_start=18)
         folium.Marker([lat, lon], tooltip="Dein Standort").add_to(m)
         st_folium(m, width=600, height=400, key="garden_map_final")
 
-with col_data:
-    st.subheader("📡 eBOD Live-Analyse")
-    st.info(f"Wabe: `{hex_id}`")
+    with col_data:
+        st.subheader("📡 eBOD Live-Analyse")
+        st.info(f"Wabe: `{hex_id}`")
 
-    # --- INTELLIGENTE PRIORITÄTS-LOGIK ---
-    if hex_id in ebod_db:
-        # PRIORITÄT 1: Deine persönlichen/genaueren Daten
-        daten = ebod_db[hex_id]
-        st.success("✅ Eigene Präzisions-Daten aktiv")
-        st.metric("Kalkgehalt", f"{daten.get('kalk', 'N/A')} %")
-        st.metric("pH-Wert", f"{daten.get('ph', 'N/A')}")
-        st.caption(f"Quelle: Dein Eintrag ({daten.get('typ', 'Garten')})")
-    else:
-        # PRIORITÄT 2: Externe offizielle Daten abrufen
-        with st.spinner("Hole offizielle eBOD-Daten..."):
-            # Hier rufen wir eine (simulierte) API-Funktion auf
-            ext_data = get_external_ebod_data(
-                lat, lon
-            )  # Diese Funktion bauen wir gleich
+        # --- INTELLIGENTE PRIORITÄTS-LOGIK ---
+        if hex_id in ebod_db:
+            # PRIORITÄT 1: Deine persönlichen/genaueren Daten
+            daten = ebod_db[hex_id]
+            st.success("✅ Eigene Präzisions-Daten aktiv")
+            st.metric("Kalkgehalt", f"{daten.get('kalk', 'N/A')} %")
+            st.metric("pH-Wert", f"{daten.get('ph', 'N/A')}")
+            st.caption(f"Quelle: Dein Eintrag ({daten.get('typ', 'Garten')})")
+        else:
+            # PRIORITÄT 2: Externe offizielle Daten abrufen
+            with st.spinner("Hole offizielle eBOD-Daten..."):
+                # Hier rufen wir eine (simulierte) API-Funktion auf
+                ext_data = get_external_ebod_data(
+                    lat, lon
+                )  # Diese Funktion bauen wir gleich
 
             if ext_data:
                 st.info("🌐 Offizielle eBOD-Daten aktiv")
