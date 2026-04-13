@@ -357,26 +357,42 @@ elif page == "Pflanzen-Experte":
     st.title("🔍 Intelligenter Pflanzen-Check")
 
     col_a, col_b = st.columns(2)
+
     with col_a:
+        # 1. POSTLEITZAHL (Vorauswahl entfernt)
         plz_input = st.text_input(
-            "PLZ für Wetter-Check:", value="8160", key="plz_input_experte"
+            "Gib deine Postleitzahl ein:",
+            value="",
+            placeholder="z.B. 8160",
+            key="plz_input_experte",
         )
 
-        # --- NEU: DIE GEMEINDE-WEICHE ---
+        # --- DIE GEMEINDE-WEICHE (REPARIERT) ---
         ausgewaehlte_gemeinde = "Standard"
         if plz_input in PLZ_MAPPING:
-            ausgewaehlte_gemeinde = st.selectbox(
-                f"PLZ {plz_input} ist mehrdeutig. Bitte wähle deinen Ort:",
-                options=PLZ_MAPPING[plz_input],
-                key="gemeinde_weiche_experte",
-            )
-        else:
-            st.caption(f"📍 Standort fixiert auf PLZ {plz_input}")
+            orte = PLZ_MAPPING[plz_input]
+            # Nur fragen, wenn es wirklich mehr als einen Ort gibt
+            if len(orte) > 1:
+                ausgewaehlte_gemeinde = st.selectbox(
+                    f"📍 PLZ {plz_input} ist mehrdeutig. Bitte wähle deinen Ort:",
+                    options=orte,
+                    key="gemeinde_weiche_experte",
+                )
+            else:
+                ausgewaehlte_gemeinde = orte[0]
+                st.caption(f"✅ Standort: {ausgewaehlte_gemeinde}")
+        elif plz_input != "":
+            st.warning(f"⚠️ PLZ {plz_input} nicht im steirischen Register gefunden.")
 
     with col_b:
+        # 2. PFLANZEN-SUCHE (Vorauswahl entfernt)
+        # WICHTIG: Wir lassen die Variable 'query', damit der Code weiter unten funktioniert!
         query = st.text_input(
-            "Welche Pflanze möchtest du prüfen?", value="Thuja"
-        ).strip()
+            "Welche Pflanze möchtest du prüfen?",
+            value="",
+            placeholder="z.B. Kirschlorbeer",
+            key="plant_query_input",  # Eindeutiger Key für Streamlit
+        )
 
     if query:
         # 1. Registry-Mapping
