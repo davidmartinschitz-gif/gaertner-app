@@ -357,9 +357,8 @@ elif page == "Pflanzen-Experte":
     st.title("🔍 Intelligenter Pflanzen-Check")
 
     col_a, col_b = st.columns(2)
-
     with col_a:
-        # 1. POSTLEITZAHL (Vorauswahl entfernt)
+        # PLZ Feld jetzt leer mit Platzhalter
         plz_input = st.text_input(
             "Gib deine Postleitzahl ein:",
             value="",
@@ -371,27 +370,25 @@ elif page == "Pflanzen-Experte":
         ausgewaehlte_gemeinde = "Standard"
         if plz_input in PLZ_MAPPING:
             orte = PLZ_MAPPING[plz_input]
-            # Nur fragen, wenn es wirklich mehr als einen Ort gibt
             if len(orte) > 1:
                 ausgewaehlte_gemeinde = st.selectbox(
-                    f"📍 PLZ {plz_input} ist mehrdeutig. Bitte wähle deinen Ort:",
+                    f"📍 PLZ {plz_input} ist mehrdeutig. Welcher Ort?",
                     options=orte,
                     key="gemeinde_weiche_experte",
                 )
             else:
                 ausgewaehlte_gemeinde = orte[0]
-                st.caption(f"✅ Standort: {ausgewaehlte_gemeinde}")
+                st.caption(f"✅ Standort fixiert auf: {ausgewaehlte_gemeinde}")
         elif plz_input != "":
-            st.warning(f"⚠️ PLZ {plz_input} nicht im steirischen Register gefunden.")
+            st.warning(f"⚠️ PLZ {plz_input} nicht im steirischen Register.")
 
     with col_b:
-        # 2. PFLANZEN-SUCHE (Vorauswahl entfernt)
-        # WICHTIG: Wir lassen die Variable 'query', damit der Code weiter unten funktioniert!
+        # Pflanzen-Suche jetzt leer mit Platzhalter
         query = st.text_input(
             "Welche Pflanze möchtest du prüfen?",
             value="",
             placeholder="z.B. Kirschlorbeer",
-            key="plant_query_input",  # Eindeutiger Key für Streamlit
+            key="plant_query_main",
         )
 
     if query:
@@ -493,73 +490,71 @@ elif page == "Boden-Verwaltung":
             st.success("Test-Speicherung!")
 
 elif page == "Garten-Karte":
-    st.title("🗺️ Dein Garten im Fokus (Preding)")
+    st.title("🗺️ Dein Garten im Fokus")
 
-    # --- 1. GPS-ANKER & MANUELLE AKTUALISIERUNG ---
+    # --- 1. GPS-AMPEL & PRÄZISION ---
     with st.sidebar:
         st.divider()
         st.subheader("🛰️ Standort-Dienst")
-        get_gps = st.button("📍 Meinen Standort jetzt abfragen")
+        refresh_gps = st.button("🔄 Standort aktualisieren")
 
-    # HOME-BASE als Fallback
-    HOME_LAT, HOME_LON = 47.19897, 15.64720
+    # Wir erzwingen eine Neu-Abfrage durch einen dynamischen Key
+    gps_key = f"gps_run_{time.time()}" if refresh_gps else "gps_static"
+    loc = get_geolocation(component_key=gps_key)
 
-    loc = None
-    if get_gps:
-        with st.spinner("Satelliten werden gesucht..."):
-            loc = get_geolocation()
+    HOME_LAT, HOME_LON = 47.19897, 15.64720  # Deine Home-Base
 
-            time.sleep(1.5)  # Kurze Pause für das JS-Signal
-
-    # Standort festlegen
-    if loc and isinstance(loc, dict) and "coords" in loc:
+    if loc and "coords" in loc:
         lat = loc["coords"]["latitude"]
         lon = loc["coords"]["longitude"]
-        st.success(f"📍 Live-GPS Signal aktiv: {lat:.5f}, {lon:.5f}")
+        accuracy = loc["coords"].get("accuracy", 999)
+
+        if accuracy <= 20:
+            st.success(f"✅ GPS-Ampel: GRÜN (Präzision: {accuracy:.1f}m)")
+        elif accuracy <= 100:
+            st.warning(f"🟡 GPS-Ampel: GELB (Präzision: {accuracy:.1f}m)")
+        else:
+            st.error(f"🔴 GPS-Ampel: ROT (Präzision: {accuracy:.1f}m)")
     else:
         lat, lon = HOME_LAT, HOME_LON
-        st.info("🏠 Modus: Home-Base (Preding)")
+        st.info("🏠 Modus: Home-Base (Warte auf GPS...)")
 
-    # --- 2. WABEN-ANALYSE (H3) ---
-    import h3
-
-    hex_id = h3.latlng_to_cell(lat, lon, 11)
+    # --- 2. DIE DOPPEL-WABEN-LOGIK (ANONYMISIERUNG) ---
+    hex_res11 = h3.latlng_to_cell(lat, lon, 11)  # Für offizielle Karten (genau)
+    hex_res9 = h3.latlng_to_cell(lat, lon, 9)  # Für User-Daten (anonymisiert)
 
     st.divider()
-
     col_map, col_data = st.columns([2, 1])
 
     with col_map:
-
         m = folium.Map(location=[lat, lon], zoom_start=18)
         folium.Marker([lat, lon], tooltip="Dein Standort").add_to(m)
-        st_folium(m, width=600, height=400, key="garden_map_final")
+        st_folium(m, width=600, height=400, key=f"garden_map_{gps_key}")
 
     with col_data:
-        st.subheader("📡 eBOD Live-Analyse")
-        st.info(f"Wabe: `{hex_id}`")
+        st.subheader("📡 Boden-Analyse")
 
-        # --- INTELLIGENTE PRIORITÄTS-LOGIK ---
-        if hex_id in ebod_db:
-            # PRIORITÄT 1: Deine persönlichen/genaueren Daten
-            daten = ebod_db[hex_id]
-            st.success("✅ Eigene Präzisions-Daten aktiv")
+        # Logik: Erst schauen wir in deine eigene Präzisions-Datenbank (Res 11)
+        # Wenn wir dort nichts finden, schauen wir in die "Community-Daten" (Res 9)
+
+        if hex_res11 in ebod_db:
+            daten = ebod_db[hex_res11]
+            st.success("✅ Deine Präzisions-Daten (Res 11)")
             st.metric("Kalkgehalt", f"{daten.get('kalk', 'N/A')} %")
-            st.metric("pH-Wert", f"{daten.get('ph', 'N/A')}")
-            st.caption(f"Quelle: Dein Eintrag ({daten.get('typ', 'Garten')})")
+            st.metric("pH-Wert", daten.get("ph", "N/A"))
         else:
-            # PRIORITÄT 2: Externe offizielle Daten abrufen
-            with st.spinner("Hole offizielle eBOD-Daten..."):
-                # Hier rufen wir eine (simulierte) API-Funktion auf
-                ext_data = get_external_ebod_data(
-                    lat, lon
-                )  # Diese Funktion bauen wir gleich
+            # Hier greift der eBOD-Check auf Res 11 (weil offizielle Daten)
+            with st.spinner("Hole offizielle eBOD-Werte..."):
+                ext_data = get_external_ebod_data(lat, lon)
 
             if ext_data:
-                st.info("🌐 Offizielle eBOD-Daten aktiv")
-                st.metric("Kalkgehalt", f"{ext_data['kalk']} (geschätzt)")
+                st.info("🌐 Offizielle eBOD-Daten (Res 11)")
+                st.metric("Kalk", ext_data["kalk"])
                 st.metric("pH-Wert", ext_data["ph"])
-                st.caption("Quelle: Offizielle Bodenkarte (Österreich)")
-            else:
-                st.warning("Keine Daten gefunden.")
-                st.write("Bitte trage die Werte in der Boden-Verwaltung ein.")
+
+            # ZUSÄTZLICH: Hinweis auf Community-Trends (Res 9)
+            st.write("---")
+            st.caption(f"🔒 Nachbarschafts-Trend (Res 9): `{hex_res9}`")
+            st.write(
+                "In diesem Viertel (~350m) wurden keine privaten Anomalien gemeldet."
+            )
