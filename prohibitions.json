@@ -1566,7 +1566,7 @@
     "Mortantsch": {
       "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"],
       "custom_rules": {
-        "heckenverordnung": {
+        "thuja_heckenverordnung": {
           "status": "verboten",
           "grund": "Spezielle lokale Richtlinie zur Vermeidung von Thujenwänden im Siedlungsgebiet.",
           "quelle": "Gemeindeamt Mortantsch"

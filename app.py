@@ -2,7 +2,6 @@ import streamlit as st
 import sqlite3
 import os
 import pandas as pd
-import difflib
 import json
 import time
 import h3
@@ -12,132 +11,91 @@ from streamlit_js_eval import get_geolocation
 from streamlit_folium import st_folium
 import folium
 
-# 1. Standort-Daten aus dem Gedächtnis oder Home-Base holen
-# (Nutze hier die Koordinaten, die wir für Preding fixiert haben)
-lat_now, lon_now = 47.19897, 15.64720
+# --- DEINE EIGENEN MODULE ---
+import plants_data
+import history_module
 
-current_hex = h3.latlng_to_cell(lat_now, lon_now, 11)
-
-# 2. JSON-Datenbank sicher laden
-ebod_db = {}
-if os.path.exists("ebod_atlas_backup.json"):
-    try:
-        with open("ebod_atlas_backup.json", "r", encoding="utf-8") as f:
-            content = f.read()
-            if content.strip():  # Prüfen, ob die Datei nicht leer ist
-                ebod_db = json.loads(content)
-    except Exception as e:
-        st.error(f"Boden-Datenbank konnte nicht geladen werden. Nutze leere Basis.")
-
-# --- 1. HYBRID-PFAD-LOGIK ---
-# Prüfen, ob wir lokal auf dem PC arbeiten oder in der Cloud
+# --- 1. GLOBALE KONFIGURATION ---
 IS_LOCAL = os.path.exists(r"E:\Database")
 
 if IS_LOCAL:
-    # Modus: Lokale Workstation (E: Laufwerk)
     DB_PATH = r"E:\Database\boden_austria.db"
     ATLAS_PATH = r"E:\Database\ebod_atlas.json"
     ENV_PATH = r"E:\Database\environment_history.json"
     BACKUP_INFO_PATH = r"E:\Database\last_backup.txt"
 else:
-    # Modus: Streamlit Cloud (Handy-Betrieb)
     DB_PATH = "boden_austria_backup.db"
     ATLAS_PATH = "ebod_atlas_backup.json"
     ENV_PATH = "environment_history_backup.json"
     BACKUP_INFO_PATH = "last_backup.txt"
 
-# --- 1. DATEN-BASIS DYNAMISCH LADEN ---
-PLZ_MAPPING = {}
-PLZ_DATEI = "plz_steiermark.json"
-
-if os.path.exists(PLZ_DATEI):
-    try:
-        with open(PLZ_DATEI, "r", encoding="utf-8") as f:
-            PLZ_MAPPING = json.load(f)
-    except Exception as e:
-        st.error(f"Fehler beim Laden der PLZ-Liste: {e}")
-else:
-    # Notfall-Fallback, falls die Datei fehlt
-    PLZ_MAPPING = {"8504": ["Preding"]}
+# --- 2. FUNKTIONS-DEFINITIONEN ---
 
 
-# --- 1. HELFER: GOOGLE DRIVE VERBINDUNG ---
 def get_drive_instance():
-    """Erstellt eine Google Drive Verbindung für Lokal oder Cloud."""
+    """Erstellt eine Drive-Verbindung. Priorisiert LOKAL (E:), um Secrets-Fehler zu vermeiden."""
     gauth = GoogleAuth()
 
+    # 1. VERSUCH: Lokal (Dein PC)
     if IS_LOCAL:
-        # Lokal am PC: Nutze die echten Dateien
-        gauth.LoadClientConfigFile("client_secrets.json")
-        # --- ANGEPASSTER LOGIN-TEIL START ---
-        gauth.GetFlow()
-        gauth.flow.params.update({"access_type": "offline"})
-        gauth.flow.params.update({"prompt": "consent"})
-        gauth.LocalWebserverAuth()  # Hier öffnet sich nun der Browser für den Login
-        # --- ANGEPASSTER LOGIN-TEIL ENDE ---
+        try:
+            if os.path.exists("client_secrets.json"):
+                gauth.LoadClientConfigFile("client_secrets.json")
+                if os.path.exists("credentials.json"):
+                    gauth.LoadCredentialsFile("credentials.json")
 
-        gauth.SaveCredentialsFile("credentials.json")
+                if gauth.access_token_expired:
+                    gauth.LocalWebserverAuth()
+                else:
+                    gauth.Authorize()
+                return GoogleDrive(gauth)
+        except Exception as e:
+            st.sidebar.error(f"Lokaler Auth-Fehler: {e}")
 
-    else:
-        # IN DER CLOUD: Wir erstellen temporäre Dateien aus den Secrets
-        if "google_drive" in st.secrets:
-            # 1. Die client_secrets "vorgaukeln"
+    # 2. VERSUCH: Cloud-Secrets (Falls vorhanden)
+    try:
+        if hasattr(st, "secrets") and "google_drive" in st.secrets:
             with open("client_secrets.json", "w") as f:
                 f.write(st.secrets["google_drive"]["client_secrets"])
-
-            # 2. Die credentials "vorgaukeln" (behebt den _module Fehler)
             with open("credentials.json", "w") as f:
                 f.write(st.secrets["google_drive"]["credentials"])
-
-            # Jetzt laden wir sie ganz normal, als wären sie echte Dateien
             gauth.LoadClientConfigFile("client_secrets.json")
             gauth.LoadCredentialsFile("credentials.json")
-
-            # Token auffrischen, falls nötig
             if gauth.access_token_expired:
                 gauth.Refresh()
             else:
                 gauth.Authorize()
-        else:
-            st.error("Google Drive Secrets fehlen in Streamlit Cloud!")
-            return None
-
-    return GoogleDrive(gauth)
-
-
-# --- 2. MODULE & INITIALER SYNC ---
-import plants_data
-import history_module
+            return GoogleDrive(gauth)
+    except:
+        pass
+    return None
 
 
-def get_external_ebod_data(lat, lon):
-    """
-    Hintergrund-Abfrage für offizielle eBOD-Daten.
-    Momentan liefert sie verlässliche Durchschnittswerte für die Steiermark,
-    solange kein lokaler 'Override' in deiner JSON existiert.
-    """
-    # Hier simulieren wir den Abruf.
-    # Für die Region Preding/Weiz/Stainz sind das typische Werte:
-    return {
-        "kalk": "5 - 12",
-        "ph": "6.5 - 7.0",
-        "typ": "Braunerde / Lockersediment-Braunerde (Offiziell)",
-    }
+def load_prohibitions():
+    """Lädt das Verbotsregister sicher in den Session State."""
+    if "prohibitions" not in st.session_state:
+        try:
+            if os.path.exists("prohibitions.json"):
+                with open("prohibitions.json", "r", encoding="utf-8") as f:
+                    st.session_state["prohibitions"] = json.load(f)
+                if IS_LOCAL:
+                    st.sidebar.success("✅ Verbotsregister aktiv")
+            else:
+                st.session_state["prohibitions"] = {}
+        except:
+            st.session_state["prohibitions"] = {}
 
 
 def sync_from_drive():
-    """Lädt die neuesten Daten aus der Cloud auf den PC/Server."""
+    """Download-Logik für den Cloud-Start."""
     try:
         drive = get_drive_instance()
         if not drive:
             return False
-
         files = {
             "boden_austria_backup.db": DB_PATH,
             "ebod_atlas_backup.json": ATLAS_PATH,
-            "environment_history_backup.json": ENV_PATH,
         }
-
         for title, target in files.items():
             file_list = drive.ListFile(
                 {"q": f"title = '{title}' and trashed = false"}
@@ -145,137 +103,86 @@ def sync_from_drive():
             if file_list:
                 file_list[0].GetContentFile(target)
         return True
-    except Exception as e:
-        st.error(f"Download-Fehler: {e}")
+    except:
         return False
 
 
-# Automatischer Start-Sync in der Cloud
-if not IS_LOCAL:
-    sync_from_drive()
-
-
-# --- 3. BACKUP-LOGIK (UPLOAD) ---
 def upload_all_to_drive():
-    """Sichert den aktuellen Stand vom PC/Handy in die Google Cloud."""
+    """Cloud-Backup vom lokalen System."""
     try:
         drive = get_drive_instance()
         if not drive:
-            return False, "Kein Zugriff auf Google Drive"
-
+            return False, "❌ Verbindung fehlgeschlagen (Auth fehlt)."
         files_to_sync = {
             "boden_austria_backup.db": DB_PATH,
             "ebod_atlas_backup.json": ATLAS_PATH,
-            "environment_history_backup.json": ENV_PATH,
         }
-
-        for title, local_path in files_to_sync.items():
-            if not os.path.exists(local_path):
-                continue
-
-            query = f"title = '{title}' and trashed = false"
-            file_list = drive.ListFile({"q": query}).GetList()
-
-            # Entweder existierende Datei updaten oder neue erstellen
-            file_drive = (
-                file_list[0] if file_list else drive.CreateFile({"title": title})
-            )
-            file_drive.SetContentFile(local_path)
-            file_drive.Upload()
-
-        # Zeitstempel für das UI speichern
+        count = 0
+        for title, path in files_to_sync.items():
+            if os.path.exists(path):
+                file_list = drive.ListFile(
+                    {"q": f"title = '{title}' and trashed = false"}
+                ).GetList()
+                file_drive = (
+                    file_list[0] if file_list else drive.CreateFile({"title": title})
+                )
+                file_drive.SetContentFile(path)
+                file_drive.Upload()
+                count += 1
         with open(BACKUP_INFO_PATH, "w") as f:
             f.write(pd.Timestamp.now().strftime("%d.%m.%Y %H:%M:%S"))
-
-        return True, "Cloud-Backup erfolgreich erstellt!"
-
+        return True, f"✅ Backup abgeschlossen ({count} Dateien)."
     except Exception as e:
-        return False, f"Fehler beim Upload: {str(e)}"
+        return False, f"❌ Cloud-Fehler: {str(e)}"
 
 
-# --- NEUE FUNKTION: VERBOTE AUS DRIVE LADEN ---
-def load_prohibitions_from_drive():
-    """Lädt die zentrale Verbots-Datenbank vom Google Drive."""
-    try:
-        drive = get_drive_instance()
-        if not drive:
-            return {}
-
-        # Wir suchen nach der Datei 'prohibitions.json' im Drive
-        query = "title = 'prohibitions.json' and trashed = false"
-        file_list = drive.ListFile({"q": query}).GetList()
-
-        if file_list:
-            # Datei gefunden -> Inhalt herunterladen
-            content = file_list[0].GetContentString()
-            return json.loads(content)
-        else:
-            # Falls die Datei noch nicht existiert, leeres Register zurückgeben
-            return {}
-    except Exception as e:
-        st.warning(f"Konnte Verbotsregister nicht laden: {e}")
-        return {}
-
-
-# --- IM DASHBOARD / UI-TEIL ---
-# Wir laden die Verbote einmal am Anfang
-if "prohibitions" not in st.session_state:
-    st.session_state["prohibitions"] = load_prohibitions_from_drive()
-# Nur zum Testen - zeigt an, wie viele Regeln geladen wurden
-# Zählt die tatsächlichen Einträge im municipalities-Ordner
-prohibitions_data = st.session_state.get("prohibitions", {})
-municipalities_count = len(prohibitions_data.get("municipalities", {}))
-
-st.write(
-    f"DEBUG: Experten-Register für {municipalities_count} steirische Gemeinden aktiv."
-)
-
-
-# --- DIE PRÜF-LOGIK BEIM SUCHEN ---
 def check_prohibition(gemeinde_name, pflanze_suche):
-    """
-    Prüft in der Hybrid-Struktur nach Verboten.
-    1. Prüft spezifische Regeln der Gemeinde.
-    2. Prüft zugeordnete globale Gruppen.
-    """
     register = st.session_state.get("prohibitions", {})
     if not register:
         return None
 
-    # 1. Zugriff auf die Gemeinde-Daten
-    muni_data = register.get("municipalities", {}).get(gemeinde_name)
-    if not muni_data:
+    munis = register.get("municipalities", {})
+    muni_key = next(
+        (
+            k
+            for k in munis
+            if k.strip().lower() in gemeinde_name.lower()
+            or gemeinde_name.lower() in k.lower()
+        ),
+        None,
+    )
+    if not muni_key:
         return None
 
-    # --- CHECK A: Spezifische Regeln (Custom Rules) ---
+    muni_data = munis[muni_key]
+    suche = pflanze_suche.lower().strip()
+
+    # 1. Prüfe lokale Sonderregeln
     custom_rules = muni_data.get("custom_rules", {})
     for verbot_name, details in custom_rules.items():
-        if verbot_name.lower() in pflanze_suche.lower():
-            return details  # Sofortiger Treffer in der Gemeinde
+        # LOGIK-FIX: Ist das Suchwort im Namen der Regel?
+        if suche in verbot_name.lower():
+            return details
 
-    # --- CHECK B: Globale Gruppen (IAS, Feuerbrand, etc.) ---
+    # 2. Prüfe abonnierte globale Gruppen (Hier steckt Thuja oft drin!)
     groups_to_check = muni_data.get("groups", [])
     global_groups = register.get("global_groups", {})
 
     for group_key in groups_to_check:
         group = global_groups.get(group_key)
         if group:
-            # Wir prüfen, ob die Pflanze in der Liste dieser Gruppe vorkommt
             for p_entry in group.get("plants", []):
-                if p_entry.lower() in pflanze_suche.lower():
-                    # Wir geben die Details der Gruppe zurück
+                # LOGIK-FIX: Ist das Suchwort in der Pflanzenliste der Gruppe?
+                if suche in p_entry.lower():
                     return {
-                        "status": "verboten",
                         "grund": f"{group.get('name')}: {group.get('grund')}",
                         "quelle": group.get("quelle"),
                     }
-
     return None
 
 
 def get_soil_status(plz_input):
-    """Prüft die Bodenwerte in DB und Atlas."""
-    # Check 1: Eigene SQL-Datenbank
+    """Boden-Check: 1. SQL (E:), 2. Atlas (RAM), 3. Standard."""
     if os.path.exists(DB_PATH):
         try:
             with sqlite3.connect(DB_PATH) as conn:
@@ -283,278 +190,157 @@ def get_soil_status(plz_input):
                     "SELECT kalkgehalt FROM boden_daten WHERE plz = ?", (plz_input,)
                 ).fetchone()
                 if row:
-                    return row[0] > 0, "Eigene Messung"
-        except Exception:
+                    return row[0] > 0, "Eigene Messung (SSD)"
+        except:
             pass
-
-    # Check 2: eBOD-Atlas (JSON)
-    if os.path.exists(ATLAS_PATH):
-        try:
-            with open(ATLAS_PATH, "r") as f:
-                atlas = json.load(f)
-                if plz_input in atlas:
-                    # Greift auf den Kalk-Wert im JSON zu
-                    kalk_wert = atlas[plz_input].get("kalk", 0)
-                    return kalk_wert > 0, "eBOD-Prognose"
-        except Exception:
-            pass
-
-    # Das return muss HIER stehen (innerhalb der Funktion, ganz am Ende)
-    return False, "Keine Daten"
+    if plz_input in ebod_db:
+        entry = ebod_db[plz_input]
+        kalk = entry.get("kalk", 0) if isinstance(entry, dict) else entry
+        return (kalk > 0), "eBOD-Atlas"
+    return False, "Standard"
 
 
-# --- 6. STREAMLIT UI ---
+# --- 3. INITIALISIERUNG ---
 st.set_page_config(page_title="Gärtner-Master 2026", page_icon="🌱", layout="wide")
+load_prohibitions()
 
-st.sidebar.title("🌿 Navigation")
+# Einmaliger Cloud-Sync (Schutz gegen Dauerschleife)
+if not IS_LOCAL and "cloud_synced" not in st.session_state:
+    if sync_from_drive():
+        st.session_state["cloud_synced"] = True
+
+# Daten laden
+PLZ_MAPPING = {}
+if os.path.exists("plz_steiermark.json"):
+    try:
+        with open("plz_steiermark.json", "r", encoding="utf-8") as f:
+            PLZ_MAPPING = json.load(f)
+    except:
+        pass
+
+ebod_db = {}
+if os.path.exists(ATLAS_PATH):
+    try:
+        with open(ATLAS_PATH, "r", encoding="utf-8") as f:
+            ebod_db = json.load(f)
+    except:
+        pass
+
+# --- 4. UI / NAVIGATION ---
+st.sidebar.title("🌿 Gärtner-Master")
+st.sidebar.info(f"System: {'Workstation (E:)' if IS_LOCAL else 'Cloud-Modus'}")
 page = st.sidebar.radio(
     "Menü:", ["Dashboard", "Pflanzen-Experte", "Boden-Verwaltung", "Garten-Karte"]
 )
 
+# --- SEITE: DASHBOARD ---
 if page == "Dashboard":
     st.title("🌱 Gärtner-Master Dashboard")
-    st.write("Willkommen in deiner digitalen Garten-Zentrale.")
+    st.info(
+        f"**Prozessor:** AMD Ryzen 7 2700X | **Lager:** Kingston HyperX Predator M.2 SSD"
+    )
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("Pflanzen im Lexikon", len(plants_data.PLANTS_REGISTRY))
+        st.metric("Lexikon", f"{len(plants_data.PLANTS_REGISTRY)} Einträge")
     with col2:
-        status_text = "✅ SSD-Datenbank bereit" if IS_LOCAL else "✅ Cloud-Mirror aktiv"
-        if not os.path.exists(DB_PATH):
-            status_text = "⚠️ Datenbank fehlt"
-        st.success(status_text)
+        st.success("Datenbank bereit" if IS_LOCAL else "Cloud-Spiegel aktiv")
     with col3:
-        st.info("☁️ Cloud-Lager: 5 TB verfügbar")
-
-    st.divider()
-
-    st.header("💾 Cloud-Synchronisation")
-    # Admin-Bereich in einem Expander verstecken
-    with st.expander("☁️ Cloud-Synchronisation & Backup"):
-        st.write(
-            "Sichere deine lokale Datenbank und den eBOD-Atlas in dein Google Drive Hauptlager."
-        )
-
-        if st.button("Jetzt Komplett-Backup auf Google Drive erstellen"):
-            with st.spinner("Synchronisiere Datenpakete..."):
-                erfolg, nachricht = upload_all_to_drive()
-                if erfolg:
-                    st.success(nachricht)
-                else:
-                    st.error(nachricht)
-
         if os.path.exists(BACKUP_INFO_PATH):
             with open(BACKUP_INFO_PATH, "r") as f:
-                st.caption(f"Letztes erfolgreiches Backup: {f.read()}")
+                st.metric("Letztes Backup", f.read())
 
     st.divider()
-    st.subheader("System-Details")
-    st.write(f"Modus: {'Lokal' if IS_LOCAL else 'Cloud'}")
-    st.write(f"Daten-Pfad: `{DB_PATH}`")
-    st.write(f"Prozessor: AMD Ryzen 7 2700X | Lager: Intenso SSD")
+    if st.button("🚀 Jetzt Cloud-Backup starten"):
+        erfolg, msg = upload_all_to_drive()
+        if erfolg:
+            st.success(msg)
+        else:
+            st.error(msg)
 
+# --- SEITE: PFLANZEN-EXPERTE ---
 elif page == "Pflanzen-Experte":
     st.title("🔍 Intelligenter Pflanzen-Check")
 
-    col_a, col_b = st.columns(2)
-    with col_a:
-        # PLZ Feld jetzt leer mit Platzhalter
-        plz_input = st.text_input(
-            "Gib deine Postleitzahl ein:",
-            value="",
-            placeholder="z.B. 8160",
-            key="plz_input_experte",
-        )
-
-        # --- DIE GEMEINDE-WEICHE (REPARIERT) ---
-        ausgewaehlte_gemeinde = "Standard"
-        if plz_input in PLZ_MAPPING:
-            orte = PLZ_MAPPING[plz_input]
-            if len(orte) > 1:
-                ausgewaehlte_gemeinde = st.selectbox(
-                    f"📍 PLZ {plz_input} ist mehrdeutig. Welcher Ort?",
-                    options=orte,
-                    key="gemeinde_weiche_experte",
-                )
-            else:
-                ausgewaehlte_gemeinde = orte[0]
-                st.caption(f"✅ Standort fixiert auf: {ausgewaehlte_gemeinde}")
-        elif plz_input != "":
-            st.warning(f"⚠️ PLZ {plz_input} nicht im steirischen Register.")
-
-    with col_b:
-        # Pflanzen-Suche jetzt leer mit Platzhalter
-        query = st.text_input(
-            "Welche Pflanze möchtest du prüfen?",
-            value="",
-            placeholder="z.B. Kirschlorbeer",
-            key="plant_query_main",
-        )
+    c1, c2 = st.columns(2)
+    with c1:
+        plz_in = st.text_input("PLZ eingeben:", "8160")
+        orte = PLZ_MAPPING.get(plz_in, ["Standard"])
+        gemeinde_in = st.selectbox("Ort wählen:", orte)
+    with c2:
+        query = st.text_input("Pflanze suchen (z.B. Acer oder Thuja):")
 
     if query:
-        # 1. Registry-Mapping
-        name_to_id = {
-            p_info["de"]: p_id for p_id, p_info in plants_data.PLANTS_REGISTRY.items()
-        }
-        name_to_id.update(
-            {
-                p_info["lat"]: p_id
-                for p_id, p_info in plants_data.PLANTS_REGISTRY.items()
-            }
-        )
-
-        # 2. Suche
-        matches = [name for name in name_to_id.keys() if query.lower() in name.lower()]
-        if not matches:
-            matches = difflib.get_close_matches(
-                query, list(name_to_id.keys()), n=3, cutoff=0.4
-            )
-
-        if not matches:
-            st.error(f"Keine Treffer für '{query}' gefunden.")
-        else:
-            selected_name = st.selectbox(
-                "Meintest du eine dieser Pflanzen?", matches, key="plant_select"
-            )
-            p_id = name_to_id[selected_name]
-
-            st.divider()
-
-            # --- PRIO 1: RECHTLICHER CHECK (PROHIBITIONS) ---
-            verbot = check_prohibition(ausgewaehlte_gemeinde, selected_name)
-
-            if verbot:
-                st.error(f"### 🚫 PFLANZVERBOT IN {ausgewaehlte_gemeinde.upper()}")
-                st.markdown(f"**Grund:** {verbot['grund']}")
-                st.caption(f"Quelle: {verbot['quelle']}")
-                st.warning("Dieser rechtliche Check hat Vorrang!")
-
-            # --- BOTANISCHE ANALYSE ---
-            st.subheader(f"Analyse für: {selected_name}")
-            res_col, env_col, soil_col = st.columns(3)
-
-            with res_col:
-                st.markdown("### 📍 Standort & Recht")
-                st.write(plants_data.check_plant(p_id, True, plz_input))
-
-            with env_col:
-                st.markdown("### 💨 Umwelt & Klima")
-                try:
-                    env = history_module.get_environmental_history(plz_input)
-                    st.info(
-                        f"Wetter-Trend für {plz_input}: {env['wind'].capitalize()}er Wind."
-                    )
-                except:
-                    st.error("Wetterdaten nicht verfügbar.")
-
-            with soil_col:
-                st.markdown("### 🧪 Boden-Passung")
-                kalk_vorhanden, quelle = get_soil_status(plz_input)
-                st.write(
-                    f"Boden-Check: {'Kalkhaltig' if kalk_vorhanden else 'Sauer/Neutral'}"
-                )
-                st.caption(f"Quelle: {quelle}")
-
-elif page == "Boden-Verwaltung":
-    st.title("📊 Boden-Datenbank & Waben-Zentrale")
-
-    st.subheader("🗄️ Historische PLZ-Daten (SQLite)")
-    DB_PATH = "bodendaten.db"
-    if os.path.exists(DB_PATH):
-        conn = sqlite3.connect(DB_PATH)
-        df_sql = pd.read_sql_query("SELECT * FROM boden_daten", conn)
-        conn.close()
-        st.dataframe(df_sql, use_container_width=True)
-    else:
-        st.info("Keine SQLite-Datenbank gefunden.")
-
-    st.divider()
-
-    st.subheader("⬢ Deine Garten-Waben (H3-Index)")
-    JSON_PATH = "ebod_atlas_backup.json"
-
-    if os.path.exists(JSON_PATH):
-        with open(JSON_PATH, "r", encoding="utf-8") as f:
-            local_db = json.load(f)
-        if local_db:
-            display_data = [{"Wabe": k, **v} for k, v in local_db.items()]
-            st.table(pd.DataFrame(display_data))
-        else:
-            st.warning("Die JSON-Datei ist leer.")
-    else:
-        st.error("JSON-Datei nicht gefunden!")
-
-    with st.expander("➕ Neuen Boden-Datensatz anlegen"):
-        new_hex = st.text_input("H3-Waben ID", key="new_hex_input")
-        if st.button("Speichern", key="save_hex_btn"):
-            st.success("Test-Speicherung!")
-
-elif page == "Garten-Karte":
-    st.title("🗺️ Dein Garten im Fokus")
-
-    # --- 1. GPS-AMPEL & PRÄZISION ---
-    with st.sidebar:
         st.divider()
-        st.subheader("🛰️ Standort-Dienst")
-        refresh_gps = st.button("🔄 Standort aktualisieren")
+        # 1. Verbots-Check (Fuzzy)
+        v = check_prohibition(gemeinde_in, query)
+        if v:
+            st.error(f"### 🚫 PFLANZVERBOT IN {gemeinde_in.upper()}")
+            st.warning(f"**Grund:** {v.get('grund')}")
 
-    # Wir erzwingen eine Neu-Abfrage durch einen dynamischen Key
-    gps_key = f"gps_run_{time.time()}" if refresh_gps else "gps_static"
-    loc = get_geolocation(component_key=gps_key)
+        # 2. Botanische Suche (Latein & Deutsch)
+        matches = []
+        for p_id, p in plants_data.PLANTS_REGISTRY.items():
+            de = str(p.get("de", "")).strip()
+            # ACER-FIX: Der Schlüssel in deiner Datei heißt "lat"!
+            la = str(p.get("lat", "")).strip()
 
-    HOME_LAT, HOME_LON = 47.19897, 15.64720  # Deine Home-Base
+            if query.lower() in de.lower() or query.lower() in la.lower():
+                label = (
+                    f"{de.capitalize()} ({la.capitalize()})"
+                    if de and la
+                    else (de or la).capitalize()
+                )
+                matches.append((label, p_id))
 
-    if loc and "coords" in loc:
-        lat = loc["coords"]["latitude"]
-        lon = loc["coords"]["longitude"]
-        accuracy = loc["coords"].get("accuracy", 999)
+        if matches:
+            sel_tuple = st.selectbox(
+                "Genaue Auswahl:", matches, format_func=lambda x: x[0]
+            )
+            p_id_final = sel_tuple[1]
+            st.subheader(f"🌿 Analyse für: {sel_tuple[0]}")
 
-        if accuracy <= 20:
-            st.success(f"✅ GPS-Ampel: GRÜN (Präzision: {accuracy:.1f}m)")
-        elif accuracy <= 100:
-            st.warning(f"🟡 GPS-Ampel: GELB (Präzision: {accuracy:.1f}m)")
+            res_a, res_b = st.columns([2, 1])
+            with res_a:
+                st.write(plants_data.check_plant(p_id_final, True, plz_in))
+            with res_b:
+                is_kalk, src = get_soil_status(plz_in)
+                st.metric("Boden", "Kalkhaltig" if is_kalk else "Sauer/Neutral")
+                st.caption(f"Quelle: {src}")
         else:
-            st.error(f"🔴 GPS-Ampel: ROT (Präzision: {accuracy:.1f}m)")
+            st.info(f"Keine Treffer für '{query}' gefunden.")
+
+# --- SEITE: BODEN-VERWALTUNG ---
+elif page == "Boden-Verwaltung":
+    st.title("📊 Datenbank-Einsicht")
+    if os.path.exists(DB_PATH):
+        try:
+            with sqlite3.connect(DB_PATH) as conn:
+                df = pd.read_sql_query("SELECT * FROM boden_daten", conn)
+                st.dataframe(df, use_container_width=True)
+        except Exception as e:
+            st.warning(f"Tabelle nicht lesbar: {e}")
     else:
-        lat, lon = HOME_LAT, HOME_LON
+        st.info("Keine SQLite-Datenbank auf E: gefunden.")
+
+# --- SEITE: GARTEN-KARTE ---
+elif page == "Garten-Karte":
+    st.title("🗺️ Standort-Analyse")
+    loc = get_geolocation()
+
+    # Sicherer GPS-Check (KeyError Fix)
+    if loc and isinstance(loc, dict) and "coords" in loc:
+        lat, lon = loc["coords"]["latitude"], loc["coords"]["longitude"]
+        st.success("📍 Standort erfasst")
+    else:
+        lat, lon = 47.19897, 15.64720  # Preding Home-Base
         st.info("🏠 Modus: Home-Base (Warte auf GPS...)")
 
-    # --- 2. DIE DOPPEL-WABEN-LOGIK (ANONYMISIERUNG) ---
-    hex_res11 = h3.latlng_to_cell(lat, lon, 11)  # Für offizielle Karten (genau)
-    hex_res9 = h3.latlng_to_cell(lat, lon, 9)  # Für User-Daten (anonymisiert)
+    try:
+        h11 = h3.latlng_to_cell(lat, lon, 11)
+    except:
+        h11 = h3.geo_to_h3(lat, lon, 11)
 
-    st.divider()
-    col_map, col_data = st.columns([2, 1])
-
-    with col_map:
-        m = folium.Map(location=[lat, lon], zoom_start=18)
-        folium.Marker([lat, lon], tooltip="Dein Standort").add_to(m)
-        st_folium(m, width=600, height=400, key=f"garden_map_{gps_key}")
-
-    with col_data:
-        st.subheader("📡 Boden-Analyse")
-
-        # Logik: Erst schauen wir in deine eigene Präzisions-Datenbank (Res 11)
-        # Wenn wir dort nichts finden, schauen wir in die "Community-Daten" (Res 9)
-
-        if hex_res11 in ebod_db:
-            daten = ebod_db[hex_res11]
-            st.success("✅ Deine Präzisions-Daten (Res 11)")
-            st.metric("Kalkgehalt", f"{daten.get('kalk', 'N/A')} %")
-            st.metric("pH-Wert", daten.get("ph", "N/A"))
-        else:
-            # Hier greift der eBOD-Check auf Res 11 (weil offizielle Daten)
-            with st.spinner("Hole offizielle eBOD-Werte..."):
-                ext_data = get_external_ebod_data(lat, lon)
-
-            if ext_data:
-                st.info("🌐 Offizielle eBOD-Daten (Res 11)")
-                st.metric("Kalk", ext_data["kalk"])
-                st.metric("pH-Wert", ext_data["ph"])
-
-            # ZUSÄTZLICH: Hinweis auf Community-Trends (Res 9)
-            st.write("---")
-            st.caption(f"🔒 Nachbarschafts-Trend (Res 9): `{hex_res9}`")
-            st.write(
-                "In diesem Viertel (~350m) wurden keine privaten Anomalien gemeldet."
-            )
+    m = folium.Map(location=[lat, lon], zoom_start=18)
+    folium.Marker([lat, lon]).add_to(m)
+    st_folium(m, width=700, height=450)
