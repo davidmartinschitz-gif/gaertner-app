@@ -1,36 +1,29 @@
 {
   "global_groups": {
     "neophyten_stmk_gesetz": {
-      "name": "Invasive Neophyten (Gesetzliches Verbot)",
+      "name": "Invasive Neophyten (Unionsliste - Absolutes Verbot)",
       "plants": [
         "Ailanthus altissima (Götterbaum)",
         "Heracleum mantegazzianum (Riesenbärenklau)",
         "Reynoutria japonica (Japanischer Staudenknöterich)",
         "Impatiens glandulifera (Drüsiges Springkraut)",
         "Ambrosia artemisiifolia (Aufrechte Ambrosia)",
-        "Asclepias syriaca (Gewöhnliche Seidenpflanze)",
-        "Solidago canadensis (Kanadische Goldrute)",
-        "Cornus sericea (Seidiger Hornstrauch)"
+        "Asclepias syriaca (Gewöhnliche Seidenpflanze)"
       ],
-      "grund": "Absolutes Verbot des Einbringens, Anpflanzens und Beförderns zur Vermeidung ökologischer Schäden und zum Schutz der Gesundheit.",
-      "quelle": "Steiermärkisches IAS-Gesetz (Invasive Artengesetz) & EU-Verordnung 1143/2014"
+      "grund": "Absolutes Verbot gemäß EU-Verordnung 1143/2014 zum Schutz der heimischen Biodiversität und Gesundheit.",
+      "quelle": "Steiermärkisches IAS-Gesetz & EU-Verbotsliste"
     },
-    "feuerbrand_wirtspflanzen_komplett": {
-      "name": "Feuerbrand-Wirtspflanzen (Schutzgebiet)",
+    "feuerbrand_wirtspflanzen_kernliste": {
+      "name": "Feuerbrand-Hauptwirtspflanzen (Striktes Verbot)",
       "plants": [
-        "Crataegus (alle Arten des Weißdorns)",
         "Cotoneaster (alle Arten der Zwergmispel)",
+        "Crataegus (Weißdorn und Rotdorn)",
         "Pyracantha (Feuerdorn)",
-        "Stranvaesia (Glanzmispel/Schildbeere)",
-        "Cydonia (Quitte - Zier- und Nutzkulturen)",
-        "Mespilus (Mispel)",
-        "Sorbus (Eberesche, Mehlbeere, Speierling)",
-        "Eriobotrya (Japanische Wollmispel)",
-        "Amelanchier (Felsenbirne)",
-        "Chaenomeles (Zierquitte)"
+        "Photinia davidiana (Lorbeermispel - ehem. Stranvaesia)",
+        "Eriobotrya (Wollmispel)"
       ],
-      "grund": "Präventivschlag gegen das Bakterium Erwinia amylovora zum Schutz des steirischen Erwerbsobstbaus (Apfel- und Birnenkulturen).",
-      "quelle": "Steiermärkische Feuerbrandverordnung / Landesgesetzblatt (LGBl.)"
+      "grund": "Präventivschutz des Erwerbsobstbaus vor Erwinia amylovora. Andere ehem. Wirtspflanzen sind seit 2021/2022 wieder zulässig.",
+      "quelle": "Steiermärkische Feuerbrandverordnung (Fassung 2026)"
     },
     "bebauungsplan_standard_stmk": {
       "name": "Standard-Bebauungsplan (Ortsbild & Ökologie)",
@@ -38,1584 +31,251 @@
         "Thuja (alle Arten des Lebensbaums)",
         "Prunus laurocerasus (Kirschlorbeer)",
         "Chamaecyparis (Scheinzypresse)",
-        "Cupressocyparis leylandii (Bastardzypresse)",
-        "Picea pungens (Blaufichte / Stechfichte)",
-        "Abies concolor (Kolorado-Tanne)",
-        "Juniperus-Kultivare (fremdländische Zier-Wacholder)"
+        "Picea pungens (Blaufichte)",
+        "Schottervorgärten / Kiesflächen (großflächig)",
+        "Abies concolor (Kolorado-Tanne)"
       ],
-      "grund": "Erhaltung des ortstypischen Landschaftsbildes und Förderung der Biodiversität; Ausschluss ökologisch wertloser 'grüner Mauern'.",
-      "quelle": "Steiermärkisches Baugesetz / Muster-Bebauungspläne der steirischen Gemeinden"
+      "grund": "Vermeidung von Hitzeinseln und Erhalt des Landschaftsbildes.",
+      "quelle": "Steiermärkisches Baugesetz & Lokale Bebauungspläne"
     }
   },
-    "municipalities": {
+  "municipalities": {
     "Graz": {
       "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
       "custom_rules": {
-        "kugelfoermige_gehoelze": {
-          "status": "teilweise verboten",
-          "grund": "Untersagung künstlicher/kugelförmiger Wuchsformen in vielen Kerngebieten zwecks Ortsbildschutz.",
-          "quelle": "Stadt Graz, Stadtplanungsamt / Verordnungen zu Einzelbebauungsplänen"
-        },
-        "einfriedungen": {
-          "status": "beschränkt",
-          "grund": "Hecken und Zäune dürfen in vielen Zonen nicht blickdicht ausgeführt werden (max. 1,50m bis 2,00m Höhe).",
-          "quelle": "Grazer Bebauungsplan-Leitfaden / § 8 Freiflächengestaltung"
-        }
-      }
-    },
-    "Kainbach bei Graz": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "standortgerechte_gehoelze": {
-          "status": "vorgeschrieben",
-          "grund": "In neuen Siedlungsgebieten sind ausschließlich standortgerechte Laubgehölze für Hecken zulässig.",
-          "quelle": "Gemeindeamt Kainbach, Bauabteilung / Bebauungspläne"
-        }
-      }
-    },
-    "Hart bei Graz": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "sichtschutz": {
-          "status": "beschränkt",
-          "grund": "Verbot von Mauern und blickdichten Zäunen; Fokus auf durchlässige Heckenstrukturen.",
-          "quelle": "Marktgemeinde Hart bei Graz, Örtliches Entwicklungskonzept (ÖEK)"
-        }
-      }
-    },
-    "Thal": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "thuja_verbot": {
-          "status": "verboten",
-          "grund": "Erhaltung des naturnahen Charakters; Thujenwände gelten als ortsuntypisch.",
-          "quelle": "Marktgemeinde Thal, Bebauungsrichtlinien"
-        }
-      }
-    },
-    "Haselsdorf-Tobelbad": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Seiersberg-Pirka": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "lebende_zaeune": {
-          "status": "bevorzugt",
-          "grund": "Einfriedungen sind bevorzugt als lebende Hecken aus heimischen Arten zu gestalten.",
-          "quelle": "Gemeinde Seiersberg-Pirka, Gestaltungsrichtlinien"
-        }
-      }
-    },
-    "St. Radegund bei Graz": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "kurort_statut": {
-          "status": "beschränkt",
-          "grund": "Besondere Auflagen für das Ortsbild als Kurort; nur ortstypische Bepflanzung erwünscht.",
-          "quelle": "Gemeindeamt St. Radegund, Ortsbildpflege"
-        }
-      }
-    },
-    "Kumberg": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Eggersdorf bei Graz": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"],
-      "custom_rules": {
-        "bebauungsplanzonierung": {
-          "status": "beschränkt",
-          "grund": "Spezifische Pflanzgebote in ausgewiesenen Bebauungsplanzonen.",
-          "quelle": "Marktgemeinde Eggersdorf, Bebauungsplanzonierungsplan"
-        }
-      }
-    },
-    "Hausmannstätten": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "naturgarten_fokus": {
-          "status": "empfohlen/vorgeschrieben",
-          "grund": "Starke Förderung von Naturgärten; Thuja und Kirschlorbeer werden in neuen Verfahren konsequent abgelehnt.",
-          "quelle": "Marktgemeinde Hausmannstätten, Bauamt / Umweltschutzberatung"
-        }
-      }
-    },
-    "Fernitz-Mellach": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "thujenhecken_verbot": {
-          "status": "verboten",
-          "grund": "Thujenhecken sind explizit als unzulässig im Bebauungsplan festgeschrieben.",
-          "quelle": "Gemeinde Fernitz-Mellach, Verordnung Bebauungsplan (z.B. §13)"
-        },
-        "heimische_laubgehoelze": {
-          "status": "vorgeschrieben",
-          "grund": "Lebende Zäune sind bevorzugt mit Hainbuche, Liguster oder Efeu zu bilden.",
-          "quelle": "Gemeinde Fernitz-Mellach, Bebauungsplan 4.0"
-        }
-      }
-    },
-    "Feldkirchen bei Graz": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "kugelfoermige_baeume": {
-          "status": "verboten",
-          "grund": "Künstliche Wuchsformen (Kugelbäume) sind in vielen Parzellierungen untersagt.",
-          "quelle": "Marktgemeinde Feldkirchen, Bebauungsplan-Verordnung"
-        }
-      }
-    },
-    "Raaba-Grambach": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"]
-    },
-    "Vasoldsberg": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-},
-    "Gratkorn": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "grüngürtel_schutz": {
-          "status": "vorgeschrieben",
-          "grund": "Pflanzgebote zur Pufferung von Industriegebieten; Fokus auf großkronige heimische Laubbäume.",
-          "quelle": "Marktgemeinde Gratkorn, Bauabteilung / Bebauungspläne Bereich Nord "
-        }
-      }
-    },
-    "Semriach": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "landschaftsschutz": {
-          "status": "beschränkt",
-          "grund": "Erhaltung des alpinen Charakters; Verbot von Fremdkörpern wie Kirschlorbeer in Außenbereichen.",
-          "quelle": "Marktgemeinde Semriach, ÖEK "
-        }
-      }
-    },
-    "Gratwein-Straßengel": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "ortsbild_strassengel": {
-          "status": "streng verboten",
-          "grund": "Besonderer Schutz im Sichtfeld der Wallfahrtskirche; Thujen und blickdichte Kunststoffzäune unzulässig.",
-          "quelle": "Marktgemeinde Gratwein-Straßengel, Ortsbildschutzverordnung "
-        }
-      }
-    },
-    "St. Oswald bei Plankenwarth": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Peggau": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Deutschfeistritz": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "mur_ufer_schutz": {
-          "status": "beschränkt",
-          "grund": "Besondere Auflagen für Grundstücke an der Mur; nur auen-typische Gehölze zulässig.",
-          "quelle": "Marktgemeinde Deutschfeistritz, Bauamt "
-        }
-      }
-    },
-    "Übelbach": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Frohnleiten": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "historischer_kern": {
-          "status": "verboten",
-          "grund": "Strikter Ausschluss nicht-heimischer Gehölze im erweiterten Altstadtbereich.",
-          "quelle": "Stadtgemeinde Frohnleiten, Gestaltungsbeirat "
-        }
-      }
-    },
-    "Premstätten": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "siedlung_zettling": {
-          "status": "verboten",
-          "grund": "In neueren Siedlungsgebieten sind Thujen und Kirschlorbeer explizit untersagt.",
-          "quelle": "Marktgemeinde Premstätten, Bebauungspläne Bereich Zettling "
-        }
-      }
-    },
-    "Wundschuh": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Dobl-Zwaring": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"]
-    },
-    "Hitzendorf": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "obstbauschutz": {
-          "status": "streng verboten",
-          "grund": "Besonders strenge Kontrolle von Feuerbrand-Wirtspflanzen aufgrund hoher Dichte an Erwerbsobstbau.",
-          "quelle": "Marktgemeinde Hitzendorf, Pflanzenschutz-Referat "
-        }
-      }
-    },
-    "Stallhofen": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Lassnitzhöhe": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "kurort_gestalt": {
-          "status": "beschränkt",
-          "grund": "Auflagen zur Villenarchitektur und Gartengestaltung; Erhalt des Waldcharakters.",
-          "quelle": "Marktgemeinde Lassnitzhöhe, Kurort-Richtlinien "
-        }
-      }
-    },
-    "Nestelbach bei Graz": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "St. Marein bei Graz": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Bruck an der Mur": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "gehoelzstrukturen": {
-          "status": "vorgeschrieben",
-          "grund": "In neuen Wohnbaugebieten sind blickdichte Nadelholzhecken untersagt; es müssen mindestens 50 % heimische Laubgehölze verwendet werden.",
-          "quelle": "Stadtgemeinde Bruck an der Mur, Bebauungsplan-Verordnungen"
-        }
-      }
-    },
-    "Kapfenberg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "stadtklima_schutz": {
-          "status": "beschränkt",
-          "grund": "Vermeidung von Schottergärten und großflächigen Thujen-Einfriedungen zur Senkung der innerstädtischen Hitzeinseln.",
-          "quelle": "Stadtgemeinde Kapfenberg, Bauabteilung / Stadtentwicklungskonzept"
-        }
-      }
-    },
-    "Tragöß-St. Katharein": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "naturschutzgebiet_gruener_see": {
-          "status": "streng beschränkt",
-          "grund": "Besondere Auflagen für das Einbringen von Pflanzen im Umfeld des Naturschutzgebietes; nur standortgerechte Alpenflora zulässig.",
-          "quelle": "Gemeindeamt Tragöß, Naturschutz-Vorgaben"
-        }
-      }
-    },
-    "Aflenz": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "kurort_statut": {
-          "status": "beschränkt",
-          "grund": "Strenge Gestaltungsvorschriften für Gärten und Einfriedungen zur Erhaltung des Prädikats 'Heilklimatischer Kurort'.",
-          "quelle": "Marktgemeinde Aflenz, Ortsbildverordnung"
-        }
-      }
-    },
-    "Turnau": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Mariazell": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "ortsbildschutz_wallfahrtsort": {
-          "status": "streng verboten",
-          "grund": "Thujenwände und exotische Koniferen gelten als wesentliche Beeinträchtigung des historischen Ortsbildes von Mariazell.",
-          "quelle": "Stadtgemeinde Mariazell, Ortsbildschutzverordnung"
-        }
-      }
-    },
-    "St. Marein im Mürztal": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "St. Lorenzen im Mürztal": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Kindberg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "blumenschmuckstadt_vorgabe": {
-          "status": "empfohlen",
-          "grund": "Fokus auf blühende und ökologisch wertvolle Heckenstrukturen statt immergrüner Sichtschutzwände.",
-          "quelle": "Stadtgemeinde Kindberg, Gestaltungsrichtlinien"
-        }
-      }
-    },
-    "Stanz im Mürztal": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Fischbach": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "hoehenluftkurort": {
-          "status": "beschränkt",
-          "grund": "Erhaltung des typischen Dorfbildes im oststeirischen Almenland; Bevorzugung von Holzlattenzäunen mit Laubhecken.",
-          "quelle": "Gemeinde Fischbach, Bauamt"
-        }
-      }
-    },
-    "Sankt Barbara im Mürztal": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Langenwang": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Krieglach": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "waldheimat_charakter": {
-          "status": "vorgeschrieben",
-          "grund": "Verwendung von Gehölzen, die dem Charakter der Rosegger-Waldheimat entsprechen; Verzicht auf exotische Zierformen.",
-          "quelle": "Marktgemeinde Krieglach, Flächenwidmungsplan / Bauordnung"
-        }
-      }
-    },
-    "Ratten": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Mürzzuschlag": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "stadtbildpflege": {
-          "status": "beschränkt",
-          "grund": "Vermeidung von massiven Thujenhecken in den Hanglagen zur Wahrung der Sichtachsen.",
-          "quelle": "Stadtgemeinde Mürzzuschlag, Bebauungspläne"
-        }
-      }
-    },
-    "Spital am Semmering": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "alpin_bauweise": {
-          "status": "beschränkt",
-          "grund": "Vorgabe standortgerechter alpiner Bepflanzung in Gebieten mit hoher touristischer Relevanz.",
-          "quelle": "Gemeinde Spital am Semmering, ÖEK"
-        }
-      }
-    },
-    "Neuberg an der Mürz": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-"Lieboch": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "ortsbild_lieboch": {
-          "status": "vorgeschrieben",
-          "grund": "In neuen Wohnsiedlungen sind blickdichte Kunststoffzäune und Thujenwände untersagt; Fokus auf lebende, heimische Hecken.",
-          "quelle": "Marktgemeinde Lieboch, Bebauungsplan-Verordnungen"
-        }
-      }
-    },
-    "Lannach": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "ökologie_lannach": {
-          "status": "verboten",
-          "grund": "Ausschluss ökologisch minderwertiger Exoten wie Kirschlorbeer in neuen Parzellierungen zur Förderung der Artenvielfalt.",
-          "quelle": "Marktgemeinde Lannach, Bauamt / ÖEK"
-        }
-      }
-    },
-    "St. Josef (Weststeiermark)": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Preding": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "St. Nikolai im Sausal": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "rebenland_schutz": {
-          "status": "beschränkt",
-          "grund": "Schutz des Landschaftsbildes im Naturpark Südsteiermark; nur ortstypische Bepflanzung zulässig.",
-          "quelle": "Gemeinde St. Nikolai, Naturpark-Richtlinien"
-        }
-      }
-    },
-    "Stainz": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "historischer_markt": {
-          "status": "streng verboten",
-          "grund": "Strikte Vorgaben für den historischen Kern und das Umfeld des Schlosses; Thujen und Zypressen als Fremdkörper unzulässig.",
-          "quelle": "Marktgemeinde Stainz, Ortsbildverordnung"
-        }
-      }
-    },
-    "Sankt Stefan ob Stainz": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"],
-      "custom_rules": {
-        "schilcherland_schutz": {
-          "status": "streng verboten",
-          "grund": "Besonderer Schutz der Obst- und Weinbaukulturen vor Feuerbrand-Wirtspflanzen.",
-          "quelle": "Steiermärkische Feuerbrandverordnung"
-        }
-      }
-    },
-    "Wettmannstätten": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Groß St. Florian": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Frauental an der Laßnitz": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "heckengestaltung": {
-          "status": "vorgeschrieben",
-          "grund": "Vorgabe von Laubgehölzen (Hainbuche, Feldahorn) statt Nadelholzhecken in neuen Baugebieten.",
-          "quelle": "Gemeinde Frauental, Bebauungsplan-Vorgaben"
-        }
-      }
-    },
-    "Bad Gams": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Deutschlandsberg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "stadtgrün_modern": {
-          "status": "verboten",
-          "grund": "Expliziter Ausschluss von Thujen und Kirschlorbeer in modernen Bebauungsplänen zur Verbesserung des Mikroklimas.",
-          "quelle": "Stadtgemeinde Deutschlandsberg, Bebauungsplan (z.B. 108BN22)"
-        }
-      }
-    },
-    "Schwanberg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "St. Peter im Sulmtal": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "St. Martin im Sulmtal": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Pölfing-Brunn": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Wies": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Eibiswald": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "grenzraum_ökologie": {
-          "status": "beschränkt",
-          "grund": "Fokus auf Erhalt der naturnahen Waldränder; Verzicht auf invasive Gartenflüchtlinge.",
-          "quelle": "Marktgemeinde Eibiswald, ÖEK"
-        }
-      }
-    },
-    "Söding-Sankt Johann": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-"Hartberg": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "ökostadt_vorgabe": {
-          "status": "vorgeschrieben",
-          "grund": "Verpflichtung zur Pflanzung von klimaresilienten Stadtbäumen und Verzicht auf ökologisch wertlose Hecken im gesamten Stadtgebiet.",
-          "quelle": "Stadtgemeinde Hartberg, Bebauungsplan-Leitfaden / Umweltreferat"
-        }
-      }
-    },
-    "St. Johann in der Haide": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"]
-    },
-    "Stubenberg": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"],
-      "custom_rules": {
-        "seeareal_schutz": {
-          "status": "beschränkt",
-          "grund": "Besondere Auflagen im Nahbereich des Stubenbergsees zur Vermeidung von Nährstoffeinträgen und zum Schutz der Uferflora.",
-          "quelle": "Gemeinde Stubenberg, Uferschutz-Richtlinien"
-        }
-      }
-    },
-    "Kaindorf": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "humus_region_fokus": {
-          "status": "empfohlen",
-          "grund": "Fokus auf Bodenbiodiversität; Verbot von chemischem Pflanzenschutz bei Heckenanlagen.",
-          "quelle": "Ökoregion Kaindorf, Gestaltungsleitfaden"
-        }
-      }
-    },
-    "Pöllau": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"],
-      "custom_rules": {
-        "naturpark_pöllauer_tal": {
-          "status": "streng verboten",
-          "grund": "Schutz der Biodiversität im Naturpark; Verbot von standortfremden Ziergehölzen wie Thujen in Außenbereichen.",
-          "quelle": "Marktgemeinde Pöllau, Naturpark-Verordnung / ÖEK"
-        }
-      }
-    },
-    "Grafendorf bei Hartberg": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Lafnitz": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Friedberg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Pinggau": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Ilz": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"]
-    },
-    "Großwilfersdorf": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Bad Waltersdorf": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "thermenort_gestaltung": {
-          "status": "beschränkt",
-          "grund": "Strenge Auflagen zur Gartenarchitektur im Umfeld der Kureinrichtungen; Förderung von blühenden, heimischen Hecken.",
-          "quelle": "Marktgemeinde Bad Waltersdorf, Ortsbildschutz"
-        }
-      }
-    },
-    "Fürstenfeld": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "festungsstadt_optik": {
-          "status": "verboten",
-          "grund": "Ausschluss von Thujen und Kunststoff-Sichtschutz im Bereich der historischen Festungsmauern.",
-          "quelle": "Stadtgemeinde Fürstenfeld, Gestaltungsrichtlinien Altstadt"
-        }
-      }
-    },
-    "Bad Blumau": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "hundertwasser_vorgabe": {
-          "status": "beschränkt",
-          "grund": "Gestaltung muss dem ökologischen Gesamtkonzept (Hundertwasser) entsprechen; keine starren Heckenformen.",
-          "quelle": "Gemeinde Bad Blumau, Bauamt / Ortsbildberatung"
-        }
-      }
-    },
-    "Burgau": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Neudau": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Markt Hartmannsdorf": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Kalsdorf bei Graz": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "industriepark_puffer": {
-          "status": "vorgeschrieben",
-          "grund": "Vorgabe großkroniger Laubbäume zur Durchgrünung im Nahbereich von Gewerbezonen.",
-          "quelle": "Marktgemeinde Kalsdorf, Bebauungsplan-Verordnungen"
-        }
-      }
-    },
-    "Werndorf": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Wildon": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "schlossberg_schutz": {
-          "status": "streng beschränkt",
-          "grund": "Besondere Auflagen im Kerngebiet und am Schlossberg; Verbot von ortsuntypischen Koniferen.",
-          "quelle": "Marktgemeinde Wildon, Ortsbildschutzverordnung"
-        }
-      }
-    },
-    "Hengsberg": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Allerheiligen bei Wildon": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Sankt Georgen an der Stiefing": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"]
-    },
-    "Wolfsberg im Schwarzautal": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Sankt Veit am Vogau": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Gabersdorf": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Leibnitz": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "stadtklima_leibnitz": {
-          "status": "verboten",
-          "grund": "Ausschluss von Thujen und Kirschlorbeer in fast allen neuen Bebauungsplänen zur Förderung der Biodiversität.",
-          "quelle": "Stadtgemeinde Leibnitz, Bauamt / ÖEK"
-        }
-      }
-    },
-    "Gralla": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Tillmitsch": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Wagna": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "römerzeit_bezug": {
-          "status": "beschränkt",
-          "grund": "Gartengestaltung im Bereich Flavia Solva sollte das archäologische Erbe berücksichtigen; keine tiefwurzelnden Exoten in Schutzzonen.",
-          "quelle": "Marktgemeinde Wagna, Denkmalschutz-Vorgaben"
-        }
-      }
-    },
-    "Kitzeck im Sausal": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "weinlandschaft_sausal": {
-          "status": "streng verboten",
-          "grund": "Striktestes Verbot von Thujen, Zypressen und Kirschlorbeer; nur heimische Gehölze (z.B. Hainbuche) zulässig.",
-          "quelle": "Gemeinde Kitzeck, Ortsbildverordnung für Steillagen"
-        }
-      }
-    },
-    "Gleinstätten": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"]
-    },
-    "Heimschuh": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Großklein": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Arnfels": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "grenzlandschaft": {
-          "status": "beschränkt",
-          "grund": "Erhalt der kleinstrukturierten Heckenlandschaft; Verzicht auf großflächige Monokulturen.",
-          "quelle": "Marktgemeinde Arnfels, Bauamt"
-        }
-      }
-    },
-    "Ehrenhausen an der Weinstraße": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "torgemeinde_schutz": {
-          "status": "streng verboten",
-          "grund": "Als Tor zur Weinstraße sind blickdichte Kunststoff- oder Thujenwände im gesamten Sichtbereich der historischen Bausubstanz untersagt.",
-          "quelle": "Marktgemeinde Ehrenhausen, Ortsbildschutz"
-        }
-      }
-    },
-    "Gamlitz": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "blumenort_gestaltung": {
-          "status": "verboten",
-          "grund": "Fokus auf blühende, heimische Hecken statt ökologisch toter Sichtschutzwände.",
-          "quelle": "Marktgemeinde Gamlitz, Gestaltungsrichtlinien"
-        }
-      }
-    },
-    "Leutschach an der Weinstraße": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "naturpark_südsteiermark": {
-          "status": "streng verboten",
-          "grund": "Schutz des typischen Hügellandcharakters; Verbot von Thujen und Kirschlorbeer in allen Bebauungsplänen.",
-          "quelle": "Marktgemeinde Leutschach, Naturpark-Richtlinien / ÖEK"
-        }
-      }
-    },
-    "Straß in Steiermark": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Mureck": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "murauen_schutz": {
-          "status": "vorgeschrieben",
-          "grund": "In der Nähe der Auengebiete sind nur standortgerechte Gehölze (z.B. Weiden, Erlen) und keine Gartenexoten zulässig.",
-          "quelle": "Stadtgemeinde Mureck, Naturschutz-Vorgaben"
-        }
-      }
-    },
-"Leoben": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "stadtklima_donawitz": {
-          "status": "vorgeschrieben",
-          "grund": "In Gebieten mit hoher industrieller Belastung sind großkronige, filterstarke Laubbäume zur Luftreinhaltung und Kühlung vorgeschrieben.",
-          "quelle": "Stadtgemeinde Leoben, Bebauungsplan-Verordnungen / Stadtplanung"
-        },
-        "fassadenbegruenung": {
-          "status": "empfohlen/gefordert",
-          "grund": "Vermeidung von Hitzeinseln in der Innenstadt; Verzicht auf Schottervorgärten.",
-          "quelle": "Stadtgemeinde Leoben, Grüngestaltungsleitfaden"
-        }
-      }
-    },
-    "Niklasdorf": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "St. Stefan ob Leoben": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Kraubath an der Mur": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "murtal_korridor": {
-          "status": "beschränkt",
-          "grund": "Erhaltung der ökologischen Durchlässigkeit entlang der Mur; Verbot von massiven, blickdichten Heckenriegeln.",
-          "quelle": "Gemeinde Kraubath, Bauamt / ÖEK"
-        }
-      }
-    },
-    "Sankt Michael in Obersteiermark": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "verkehrsknoten_schutz": {
-          "status": "vorgeschrieben",
-          "grund": "Verwendung von abgasresistenten, heimischen Heckenpflanzen zur Lärm- und Staubminderung im Siedlungsraum.",
-          "quelle": "Marktgemeinde St. Michael, Bebauungspläne"
-        }
-      }
-    },
-    "Traboch (Timmersdorf)": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Kammern im Liesingtal": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "liesingtal_optik": {
-          "status": "beschränkt",
-          "grund": "Wahrung des ländlichen Talcharakters; Verzicht auf exotische Gartenflüchtlinge in Waldnähe.",
-          "quelle": "Marktgemeinde Kammern, Bauabteilung"
-        }
-      }
-    },
-    "Mautern in Steiermark": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "wildtier_schutz": {
-          "status": "beschränkt",
-          "grund": "Vermeidung von Giftpflanzen und invasiven Arten im Umfeld des Abenteuerzentrums/Wildparks zur Sicherung der lokalen Fauna.",
-          "quelle": "Marktgemeinde Mautern, Umweltvorgaben"
-        }
-      }
-    },
-    "Kalwang": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Wald am Schoberpaß": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "alpin_standard": {
-          "status": "vorgeschrieben",
-          "grund": "Aufgrund der Höhenlage sind nur frostharte, standortgerechte Gebirgsgehölze zulässig; Verbot von mediterranen Exoten.",
-          "quelle": "Gemeinde Wald am Schoberpaß, Bauamt"
-        }
-      }
-    },
-    "Eisenerz": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "bergstadt_schutz": {
-          "status": "beschränkt",
-          "grund": "Schutz des historischen Ensembles; Thujen und Kirschlorbeer gelten in den alten Arbeitersiedlungen als ortsfremd.",
-          "quelle": "Stadtgemeinde Eisenerz, Ortsbildpflege / Altstadtsatzung"
-        }
-      }
-    },
-    "St. Peter-Freienstein": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Trofaiach": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "gartenstadt_vorgabe": {
-          "status": "beschränkt",
-          "grund": "Fokus auf Obstbäume und Nutzgärten; Beschränkung von reinen Zier-Koniferenhecken.",
-          "quelle": "Stadtgemeinde Trofaiach, Bebauungsrichtlinien"
-        }
-      }
-    },
-    "Vordernberg": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "montan_ensemble": {
-          "status": "beschränkt",
-          "grund": "Erhaltung der Sichtachsen auf die Industriedenkmäler (Radwerke); blickdichte Hecken über 1,80m oft untersagt.",
-          "quelle": "Marktgemeinde Vordernberg, Ortsbildschutz"
-        }
-      }
-    },
-    "Radmer": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
- "Selzthal": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "bahnbetrieb_schutz": {
-          "status": "beschränkt",
-          "grund": "Anpflanzungen im Nahbereich von Gleisanlagen müssen pflegeleicht und bruchsicher sein; Verbot von hohen, instabilen Baumarten.",
-          "quelle": "Gemeinde Selzthal, Bauamt / Sicherheitsvorschriften ÖBB"
-        }
-      }
-    },
-    "Lassing": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Ardning": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "moorschutz_pürgschachen": {
-          "status": "streng beschränkt",
-          "grund": "Besonderer Schutz des Moorgebietes; Verbot invasiver Arten, die den Wasserhaushalt oder die Moorflora stören könnten.",
-          "quelle": "Gemeinde Ardning, Naturschutzplan Pürgschachenmoor"
-        }
-      }
-    },
-    "Admont": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "nationalpark_gesäuse_nähe": {
-          "status": "streng verboten",
-          "grund": "Strikte Verwendung standortgerechter, heimischer Gehölze zum Schutz der Biodiversität des angrenzenden Nationalparks.",
-          "quelle": "Marktgemeinde Admont, Ortsbildschutzverordnung / Nationalpark-Beirat"
-        }
-      }
-    },
-    "Weißenbach an der Enns": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Weng im Gesäuse": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Hall bei Admont": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Hieflau": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Altenmarkt bei Sankt Gallen": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Landl": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "naturpark_eisenwurzen": {
-          "status": "beschränkt",
-          "grund": "Erhaltung der Streuobstwiesen-Kultur; Verzicht auf ortsfremde Ziergehölze in den Kernzonen.",
-          "quelle": "Gemeinde Landl, Naturpark-Richtlinien"
-        }
-      }
-    },
-    "Wildalpen": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "quellschutzgebiet_wien": {
-          "status": "streng beschränkt",
-          "grund": "Extremer Schutz des Grundwassers (Wiener Hochquellenleitung); Verbot von Pflanzen, die hohen Düngemitteleinsatz oder Pestizide erfordern.",
-          "quelle": "Gemeinde Wildalpen, Wasserschutzverordnung"
-        }
-      }
-    },
-    "Sankt Gallen": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Liezen": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "stadtökologie": {
-          "status": "verboten",
-          "grund": "Ausschluss von Thuja und Kirschlorbeer in allen neuen Bebauungsplänen zur Förderung eines hitzeresistenten Stadtklimas.",
-          "quelle": "Stadtgemeinde Liezen, Bebauungspläne / Stadtmarketing"
-        }
-      }
-    },
-    "Wörschach": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Aigen im Ennstal": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Stainach-Pürgg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "ortsbild_pürgg": {
-          "status": "streng verboten",
-          "grund": "Das 'Kripperl der Steiermark' unterliegt strengstem Denkmalschutz; moderne Sichtschutzwände (Thuja/Zypressen) sind absolut unzulässig.",
-          "quelle": "Gemeinde Stainach-Pürgg, Ortsbildschutzverordnung Pürgg"
-        }
-      }
-    },
-    "Irdning-Donnersbachtal": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "alpin_ästhetik": {
-          "status": "beschränkt",
-          "grund": "Vorgabe von regionaltypischen Holz- oder Steinmauer-Einfriedungen kombiniert mit Laubgehölzen.",
-          "quelle": "Marktgemeinde Irdning-Donnersbachtal, Bauamt"
-        }
-      }
-    },
-    "St. Martin am Grimming": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-"Öblarn": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "waldbau_priorität": {
-          "status": "vorgeschrieben",
-          "grund": "Aufgrund der Tallage und Lawinenschutzrelevanz sind in Waldrandnähe nur tiefwurzelnde, standortgerechte Laubgehölze zulässig.",
-          "quelle": "Marktgemeinde Öblarn, Bauamt / Wildbach- und Lawinenverbauung"
-        }
-      }
-    },
-    "Stein an der Enns": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "naturpark_sölktäler": {
-          "status": "streng verboten",
-          "grund": "Innerhalb des Naturparks sind exotische Ziergehölze und invasive Arten strengstens untersagt, um die alpine Flora nicht zu verfälschen.",
-          "quelle": "Gemeinde Sölk, Naturpark-Verordnung"
-        }
-      }
-    },
-    "Gröbming": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "klimabündnis_vorgabe": {
-          "status": "verboten",
-          "grund": "Ausschluss von Thuja und Kirschlorbeer in allen neuen Siedlungsgebieten zur Förderung der Artenvielfalt.",
-          "quelle": "Marktgemeinde Gröbming, Bebauungsplan-Richtlinien"
-        }
-      }
-    },
-    "Haus im Ennstal": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "weltcup_ortsbild": {
-          "status": "streng beschränkt",
-          "grund": "Hohe Auflagen zur Gartengestaltung im Sichtbereich der touristischen Hauptzonen; Bevorzugung von regionaltypischen Holzarchitekturen und Hecken.",
-          "quelle": "Marktgemeinde Haus, Ortsbildschutzverordnung"
-        }
-      }
-    },
-    "Aich": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Schladming": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "zentrum_schutz": {
-          "status": "streng verboten",
-          "grund": "Im gesamten Kerngebiet und den touristischen Vorrangzonen sind Thujen, Zypressen und Kirschlorbeer als ortsfremd unzulässig.",
-          "quelle": "Stadtgemeinde Schladming, Bebauungspläne / Stadtplanung"
-        },
-        "sichtachsen_erhalt": {
-          "status": "beschränkt",
-          "grund": "Maximale Heckenhöhe von 1,50m in bestimmten Hanglagen zur Erhaltung der Fernsicht auf das Dachsteinmassiv.",
-          "quelle": "Stadtgemeinde Schladming, ÖEK"
-        }
-      }
-    },
-    "Ramsau am Dachstein": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "hochplateau_ökologie": {
-          "status": "streng verboten",
-          "grund": "Auf dem Hochplateau sind nur autochthone (einheimische) Gehölze erlaubt; Verbot jeglicher Gartenflüchtlinge zum Schutz der Almen.",
-          "quelle": "Gemeinde Ramsau, Landschaftsschutzverordnung Dachstein"
-        }
-      }
-    },
-    "Bad Mitterndorf": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "kurort_gestalt": {
-          "status": "beschränkt",
-          "grund": "Besondere Auflagen für Zäune und Hecken zur Wahrung des weitläufigen Landschaftscharakters; keine massiven Sichtschutzmauern.",
-          "quelle": "Marktgemeinde Bad Mitterndorf, Kurort-Statut / Bauamt"
-        }
-      }
-    },
-    "Bad Aussee": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "trachtenstadt_kodex": {
-          "status": "streng verboten",
-          "grund": "Als 'Hauptstadt der Tracht' legt Bad Aussee höchsten Wert auf Tradition; Thujen gelten als architektonischer und botanischer Fremdkörper.",
-          "quelle": "Stadtgemeinde Bad Aussee, Ortsbildschutzverordnung"
-        },
-        "alpenflora_schutz": {
-          "status": "vorgeschrieben",
-          "grund": "In Landschaftsschutzgebieten dürfen nur standortgerechte Gehölze (z.B. Lärche, Vogelbeere) gepflanzt werden.",
-          "quelle": "Stadtgemeinde Bad Aussee, Naturschutz-Vorgaben"
-        }
-      }
-    },
-    "Altaussee": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "seeschutz_ufer": {
-          "status": "streng verboten",
-          "grund": "Strikte Auflagen im Nahbereich des Sees; Verbot von Düngung und standortfremden Hecken zur Erhaltung der Wasserqualität.",
-          "quelle": "Gemeinde Altaussee, Seeschutz-Richtlinien"
-        }
-      }
-    },
-    "Grundlsee": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "landschaftsensemble": {
-          "status": "streng verboten",
-          "grund": "Schutz des einzigartigen Ensembles aus Bergen und See; Verzicht auf jegliche exotisierende Bepflanzung.",
-          "quelle": "Gemeinde Grundlsee, Bebauungspläne"
-        }
-      }
-    },
-    "Murau": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "historische_altstadt": {
-          "status": "streng verboten",
-          "grund": "Schutz des mittelalterlichen Ensembles; Thujen und moderne Sichtschutzzäune sind im gesamten Kerngebiet sowie im Sichtbereich des Schlosses unzulässig.",
-          "quelle": "Stadtgemeinde Murau, Altstadterhaltungs- und Gestaltungsrichtlinien"
-        }
-      }
-    },
-    "St. Lambrecht": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "naturpark_zirbitzkogel": {
-          "status": "streng verboten",
-          "grund": "Innerhalb des Naturparks sind invasive Neophyten und exotische Nadelgehölze untersagt, um die alpine Artenvielfalt und den Charakter des Stiftsumfelds zu schützen.",
-          "quelle": "Marktgemeinde St. Lambrecht, Naturpark-Satzung / Bauamt"
-        }
-      }
-    },
-    "Neumarkt in der Steiermark": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "erholungsraum_schutz": {
-          "status": "beschränkt",
-          "grund": "Vorgabe von heimischen Hecken (z.B. Lärche, Hainbuche) zur ökologischen Vernetzung im Siedlungsraum.",
-          "quelle": "Marktgemeinde Neumarkt, ÖEK / Gestaltungsbeirat"
-        }
-      }
-    },
-    "Scheifling": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Teufenbach-Katsch": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Oberwölz": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "stadtmauer_schutz": {
-          "status": "streng verboten",
-          "grund": "Im Bereich der historischen Stadtmauer sind blickdichte Heckenriegel untersagt, um die Sichtbarkeit des Denkmals zu gewährleisten.",
-          "quelle": "Stadtgemeinde Oberwölz, Denkmalschutz-Vorgaben"
-        }
-      }
-    },
-    "Niederwölz": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Ranten": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Krakau": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "luftkurort_ökologie": {
-          "status": "vorgeschrieben",
-          "grund": "Erhaltung der alpinen Reinheit; Verbot von Pflanzen mit hohem allergischem Potenzial oder invasivem Drang.",
-          "quelle": "Gemeinde Krakau, Statut als Luftkurort"
-        }
-      }
-    },
-    "Stadl-Predlitz": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "biosphärenpark_nockberge": {
-          "status": "streng beschränkt",
-          "grund": "Auflagen zur Vermeidung von Florenverfälschung im Grenzbereich zum Biosphärenpark; nur standortgerechte Gebirgsflora.",
-          "quelle": "Gemeinde Stadl-Predlitz, Managementplan Biosphärenpark"
-        }
-      }
-    },
-    "St. Georgen am Kreischberg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "tourismuszone_ästhetik": {
-          "status": "beschränkt",
-          "grund": "Vorgabe von Holz-Einfriedungen; Thujenhecken werden in touristischen Vorrangzonen abgelehnt.",
-          "quelle": "Gemeinde St. Georgen, Bebauungsrichtlinien"
-        }
-      }
-    },
-    "Mühlen": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "St. Peter am Kammersberg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Judenburg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "historisches_zentrum": {
-          "status": "streng verboten",
-          "grund": "Erhaltung der mittelalterlichen Stadtsilhouette; Thujenhecken und künstliche Sichtschutzwände sind im Altstadtkern unzulässig.",
-          "quelle": "Stadtgemeinde Judenburg, Altstadterhaltungsgesetz / Bebauungsplan"
-        },
-        "klimaschutz_aichfeld": {
-          "status": "vorgeschrieben",
-          "grund": "In neuen Gewerbe- und Wohngebieten sind zur Beschattung großkronige Laubbäume statt blickdichter Koniferenriegel zu pflanzen.",
-          "quelle": "Stadtgemeinde Judenburg, Grüngestaltungsplan"
-        }
-      }
-    },
-    "Knittelfeld": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "hitzeinsel_prävention": {
-          "status": "verboten",
-          "grund": "Explizites Verbot von Thujen und Kirschlorbeer in verdichteten Wohngebieten zur Förderung der Durchlüftung und Kühlung.",
-          "quelle": "Stadtgemeinde Knittelfeld, Bebauungsrichtlinien / ÖEK"
-        }
-      }
-    },
-    "Spielberg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "projekt_spielberg_ästhetik": {
-          "status": "beschränkt",
-          "grund": "Hohe landschaftliche Gestaltungsauflagen im Umfeld des Red Bull Rings; Bevorzugung von standortgerechten Heckenstrukturen für das internationale Ortsbild.",
-          "quelle": "Stadtgemeinde Spielberg, Bauamt / Gestaltungsbeirat"
-        }
-      }
-    },
-    "Zeltweg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "flughafen_umfeld": {
-          "status": "beschränkt",
-          "grund": "Bepflanzungen im Anflugbereich dürfen keine Vogelschwärme anziehen und müssen bruchsicher sein; Beschränkung für bestimmte Fruchtgehölze.",
-          "quelle": "Stadtgemeinde Zeltweg, Flugsicherheitsauflagen / Bauamt"
-        }
-      }
-    },
-    "Pöls-Oberkurzheim": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "immissionsschutz": {
-          "status": "vorgeschrieben",
-          "grund": "Vorgabe abgasresistenter Laubgehölze im Nahbereich der Industriezonen zur Staubbindung.",
-          "quelle": "Marktgemeinde Pöls-Oberkurzheim, Umweltvorgaben"
-        }
-      }
-    },
-    "Fohnsdorf": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "bergbau_folgelandschaft": {
-          "status": "beschränkt",
-          "grund": "Besondere Auflagen für Bepflanzungen auf ehemaligen Bergbauflächen (Stabilität und Wasserhaushalt).",
-          "quelle": "Gemeinde Fohnsdorf, Bauamt"
-        }
-      }
-    },
-    "Obdach": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "zirbenland_charakter": {
-          "status": "vorgeschrieben",
-          "grund": "Förderung regionaler Nadelhölzer (Zirbe, Lärche) in Außenbereichen; Verbot von fremdländischen Zuchtformen im Sichtbereich der Wanderwege.",
-          "quelle": "Marktgemeinde Obdach, Ortsbildschutzverordnung"
-        }
-      }
-    },
-    "Weißkirchen in Steiermark": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Pölstal": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Hohentauern": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "hochbündner_ökologie": {
-          "status": "streng verboten",
-          "grund": "Aufgrund der extremen Höhenlage sind nur spezialisierte alpine Gehölze zulässig; Verbot von Kirschlorbeer und Thuja wegen Frostschäden und Florenverfälschung.",
-          "quelle": "Gemeinde Hohentauern, Alpenökologie-Richtlinien"
-        }
-      }
-    },
-    "Gaal": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Seckau": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "abtei_umfeldschutz": {
-          "status": "streng verboten",
-          "grund": "Strikte Auflagen im Umfeld der Abtei Seckau; keine modernen Sichtschutzwände, die die historische Fernwirkung stören.",
-          "quelle": "Marktgemeinde Seckau, Ortsbildverordnung"
-        }
-      }
-    },
-    "St. Marein-Feistritz": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "St. Margarethen bei Knittelfeld": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Feldbach": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "vulkanland_ästhetik": {
-          "status": "vorgeschrieben",
-          "grund": "In neuen Siedlungsgebieten sind blickdichte Kunststoffzäune und Thujen untersagt; Fokus auf ökologisch wertvolle Pufferstreifen.",
-          "quelle": "Stadtgemeinde Feldbach, Bebauungsplan / ÖEK"
-        }
-      }
-    },
-    "Bad Gleichenberg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "kurpark_schutz": {
-          "status": "streng verboten",
-          "grund": "Erhaltung des historischen Villen- und Kurparkcharakters; Verbot von Kirschlorbeer und Thuja im gesamten Kurbezirk.",
-          "quelle": "Gemeinde Bad Gleichenberg, Ortsbildschutzverordnung"
-        }
-      }
-    },
-    "Bad Radkersburg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "denkmalschutz_altstadt": {
-          "status": "streng verboten",
-          "grund": "Strikte Auflagen für die historische Altstadt; keine modernen Sichtschutzsysteme oder exotische Nadelgehölze zulässig.",
-          "quelle": "Stadtgemeinde Bad Radkersburg, Altstadterhaltungsgesetz"
-        }
-      }
-    },
-    "Fehring": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"]
-    },
-    "Gnas": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"],
-      "custom_rules": {
-        "agrarstruktur_schutz": {
-          "status": "beschränkt",
-          "grund": "Schutz der umliegenden Obstbaugebiete vor Bakterienherden durch konsequente Entfernung von Wirtspflanzen.",
-          "quelle": "Marktgemeinde Gnas, Pflanzenschutz-Vorgaben"
-        }
-      }
-    },
-    "Straden": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"],
-      "custom_rules": {
-        "kulturlandschaft_vier_türme": {
-          "status": "beschränkt",
-          "grund": "Sicherung der Sichtachsen auf das Kirchenensemble; Beschränkung der Heckenhöhe auf max. 1,60m in Kernzonen.",
-          "quelle": "Marktgemeinde Straden, Ortsbildpflege"
-        }
-      }
-    },
-    "Riegersburg": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"],
-      "custom_rules": {
-        "burganblick_schutz": {
-          "status": "streng verboten",
-          "grund": "Verbot von standortfremden Nadelgehölzen im gesamten Sichtbereich der Burg Riegersburg zur Wahrung des Landschaftsbildes.",
-          "quelle": "Marktgemeinde Riegersburg, ÖEK / Landschaftsschutz"
-        }
-      }
-    },
-    "Kirchberg an der Raab": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"]
-    },
-    "St. Stefan im Rosental": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Paldau": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Kirchbach-Zerlach": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Jagerberg": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Mettersdorf am Saßbach": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Sankt Peter am Ottersbach": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"],
-      "custom_rules": {
-        "weinbau_priorität": {
-          "status": "beschränkt",
-          "grund": "Schutz der Wein- und Obstbaulandschaft vor invasiven Neophyten.",
-          "quelle": "Marktgemeinde St. Peter, Bauamt"
-        }
-      }
-    },
-    "Halbenrain": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Klöch": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "weinbaugebiet_schutz": {
-          "status": "vorgeschrieben",
-          "grund": "Bevorzugung von standortgerechten Hecken (z.B. Liguster) zur Förderung von Nützlingen im Weinberg.",
-          "quelle": "Marktgemeinde Klöch, Naturschutz-Vorgaben"
-        }
-      }
-    },
-    "Tieschen": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Kapfenstein": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Edelsbach bei Feldbach": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Eichkögl": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Voitsberg": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "stadtklima_voitsberg": {
-          "status": "vorgeschrieben",
-          "grund": "Vorgabe klimaresilienter Laubbäume zur Reduktion der sommerlichen Überhitzung im Stadtkern.",
-          "quelle": "Stadtgemeinde Voitsberg, Bebauungsplan / Umweltabteilung"
-        }
-      }
-    },
-    "Bärnbach": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "hundertwasser_ästhetik": {
-          "status": "streng verboten",
-          "grund": "Im Umfeld der St. Barbara Kirche (Hundertwasser) sind starre Thujenhecken und künstliche Sichtschutzwände absolut untersagt, um die künstlerische Gestaltung nicht zu beeinträchtigen.",
-          "quelle": "Stadtgemeinde Bärnbach, Ortsbildschutzverordnung"
-        }
-      }
-    },
-    "Köflach": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "lipizzaner_heimat_design": {
-          "status": "beschränkt",
-          "grund": "Förderung von traditionellen Holzzäunen und heimischen Heckenstrukturen im Nahbereich des Bundesgestüts Piber.",
-          "quelle": "Stadtgemeinde Köflach, Gestaltungsrichtlinien"
-        }
-      }
-    },
-    "Maria Lankowitz": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "wallfahrtsort_schutz": {
-          "status": "streng verboten",
-          "grund": "Schutz des historischen Ortskerns um die Wallfahrtskirche; Thujen gelten als unpassender Fremdkörper.",
-          "quelle": "Marktgemeinde Maria Lankowitz, Bebauungsplan"
-        }
-      }
-    },
-    "Edelschrott": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "stausee_ökologie": {
-          "status": "beschränkt",
-          "grund": "Besondere Auflagen im Einzugsgebiet des Packer Stausees zur Vermeidung von Florenverfälschung.",
-          "quelle": "Marktgemeinde Edelschrott, Naturschutz-Vorgaben"
-        }
-      }
-    },
-    "Hirschegg-Pack": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "alpin_standard": {
-          "status": "vorgeschrieben",
-          "grund": "In den Hochlagen sind nur frostharte, standortgerechte Gebirgsgehölze zulässig; Verzicht auf empfindliche Gartenflüchtlinge.",
-          "quelle": "Gemeinde Hirschegg-Pack, Bauamt"
-        }
-      }
-    },
-    "Kainach bei Voitsberg": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Krottendorf-Gaisfeld": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Ligist": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"],
-      "custom_rules": {
-        "wein_obstbau_schutz": {
-          "status": "streng verboten",
-          "grund": "Extrem hoher Schutzstatus für Obst- und Weinkulturen vor Feuerbrand-Wirtspflanzen (besonders Cotoneaster).",
-          "quelle": "Marktgemeinde Ligist, Pflanzenschutz-Vorgaben"
-        }
-      }
-    },
-    "Mooskirchen": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "blumenmarkt_vorgabe": {
-          "status": "empfohlen",
-          "grund": "Als mehrfacher Blumenschmuck-Sieger wird auf blühende Hecken statt immergrüner Koniferen Wert gelegt.",
-          "quelle": "Marktgemeinde Mooskirchen, Gestaltungsbeirat"
-        }
-      }
-    },
-    "Rosental an der Kainach": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Sankt Martin am Wöllmißberg": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Stallhofen": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Weiz": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "klimafitte_stadt_weiz": {
-          "status": "vorgeschrieben",
-          "grund": "In allen neuen Bebauungsplänen sind Thujen und großflächige Schotterungen untersagt; stattdessen sind standortgerechte Laubbäume zur Beschattung zu pflanzen.",
-          "quelle": "Stadtgemeinde Weiz, Stadtplanung / Bebauungspläne (z.B. Bereich Weiz-Nord)"
-        }
-      }
-    },
-    "Gleisdorf": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "solarstadt_ökologie": {
-          "status": "streng verboten",
-          "grund": "Vermeidung von Hitzeinseln; Thujen und Kirschlorbeer werden in neuen Verfahren konsequent durch heimische Laubhecken ersetzt.",
-          "quelle": "Stadtgemeinde Gleisdorf, Bebauungsplan-Verordnungen"
-        }
-      }
-    },
-    "Puch bei Weiz": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"],
-      "custom_rules": {
-        "zentrum_des_apfelhandels": {
-          "status": "absolutes verbot",
-          "grund": "Als Kernzone des steirischen Apfelanbaus gilt hier eine Null-Toleranz-Politik gegenüber Feuerbrand-Wirtspflanzen (Cotoneaster, Weißdorn etc.).",
-          "quelle": "Gemeinde Puch bei Weiz, Landwirtschaftsreferat / Feuerbrand-VO"
-        }
-      }
-    },
-    "St. Ruprecht an der Raab": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"],
-      "custom_rules": {
-        "gartendorf_ästhetik": {
-          "status": "vorgeschrieben",
-          "grund": "Fokus auf touristisch ansprechende, blühende Gehölze statt rein funktionalem Sichtschutz.",
-          "quelle": "Marktgemeinde St. Ruprecht, Ortsbildpflege"
-        }
-      }
-    },
-    "Anger": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Birkfeld": {
-      "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"]
-    },
-    "Passail": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "almenland_naturpark": {
-          "status": "streng verboten",
-          "grund": "Innerhalb des Naturparks Almenland ist das Einbringen von invasiven Neophyten und exotischen Nadelhölzern zum Schutz der Almen untersagt.",
-          "quelle": "Marktgemeinde Passail, Naturpark-Richtlinien"
-        }
-      }
-    },
-    "St. Margarethen an der Raab": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"]
-    },
-    "Pischelsdorf am Kulm": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Sinabelkirchen": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett", "bebauungsplan_standard_stmk"]
-    },
-    "Floing": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Mortantsch": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"],
-      "custom_rules": {
-        "thuja_heckenverordnung": {
-          "status": "verboten",
-          "grund": "Spezielle lokale Richtlinie zur Vermeidung von Thujenwänden im Siedlungsgebiet.",
-          "quelle": "Gemeindeamt Mortantsch"
-        }
-      }
-    },
-    "Naas": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Thannhausen": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "Gutenberg-Stenzengreith": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    },
-    "St. Kathrein am Offenegg": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "bergdorf_charakter": {
-          "status": "beschränkt",
-          "grund": "Schutz des typischen Almenland-Dorfbildes; Bevorzugung von standortgerechten Ebereschen und Ahorn.",
-          "quelle": "Gemeinde St. Kathrein, Bauamt"
-        }
-      }
-    },
-    "Gasen": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Fischbach": {
-      "groups": ["neophyten_stmk_gesetz"],
-      "custom_rules": {
-        "höhenluftkurort_status": {
-          "status": "beschränkt",
-          "grund": "Erhalt der Luftqualität und des dörflichen Charakters; Verbot von exotischen Ziergehölzen mit hohem Allergiepotenzial.",
-          "quelle": "Gemeinde Fischbach, Kurort-Vorgaben"
-        }
-      }
-    },
-    "Rettenegg": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Strallegg": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Miesenbach bei Birkfeld": {
-      "groups": ["neophyten_stmk_gesetz"]
-    },
-    "Ludmannsdorf": {
-      "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_komplett"]
-    }
+        "kugelfoermige_gehoelze": { "status": "teilweise verboten", "grund": "Untersagung künstlicher Wuchsformen in Kerngebieten.", "quelle": "Stadt Graz, Stadtplanungsamt" },
+        "einfriedungen": { "status": "beschränkt", "grund": "Heckenhöhe max. 1,50m bis 2,00m; Verbot blickdichter Kunststoffzäune.", "quelle": "Grazer Bebauungsplan-Leitfaden" }
+      }
+    },
+    "Kainbach bei Graz": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Hart bei Graz": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Thal": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"], "custom_rules": { "thuja": { "status": "verboten", "grund": "Erhaltung des naturnahen Charakters.", "quelle": "Marktgemeinde Thal" } } },
+    "Haselsdorf-Tobelbad": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Seiersberg-Pirka": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "St. Radegund bei Graz": { "groups": ["neophyten_stmk_gesetz"] },
+    "Kumberg": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Eggersdorf bei Graz": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Hausmannstätten": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Fernitz-Mellach": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Feldkirchen bei Graz": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Raaba-Grambach": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Vasoldsberg": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Gratkorn": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Semriach": { "groups": ["neophyten_stmk_gesetz"] },
+    "Gratwein-Straßengel": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"], "custom_rules": { "wallfahrtskirche": { "status": "verboten", "grund": "Ortsbildschutz im Sichtfeld der Kirche.", "quelle": "Marktgemeinde Gratwein-Straßengel" } } },
+    "St. Oswald bei Plankenwarth": { "groups": ["neophyten_stmk_gesetz"] },
+    "Peggau": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Deutschfeistritz": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Übelbach": { "groups": ["neophyten_stmk_gesetz"] },
+    "Frohnleiten": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Premstätten": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Wundschuh": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Dobl-Zwaring": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Hitzendorf": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Stallhofen": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Lassnitzhöhe": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Nestelbach bei Graz": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "St. Marein bei Graz": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Bruck an der Mur": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Kapfenberg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Tragöß-St. Katharein": { "groups": ["neophyten_stmk_gesetz"] },
+    "Aflenz": { "groups": ["neophyten_stmk_gesetz"] },
+    "Turnau": { "groups": ["neophyten_stmk_gesetz"] },
+    "Mariazell": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "St. Marein im Mürztal": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "St. Lorenzen im Mürztal": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Kindberg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Stanz im Mürztal": { "groups": ["neophyten_stmk_gesetz"] },
+    "Fischbach": { "groups": ["neophyten_stmk_gesetz"] },
+    "Sankt Barbara im Mürztal": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Langenwang": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Krieglach": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Ratten": { "groups": ["neophyten_stmk_gesetz"] },
+    "Mürzzuschlag": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Spital am Semmering": { "groups": ["neophyten_stmk_gesetz"] },
+    "Neuberg an der Mürz": { "groups": ["neophyten_stmk_gesetz"] },
+    "Lieboch": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Lannach": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "St. Josef (Weststeiermark)": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Preding": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "St. Nikolai im Sausal": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Stainz": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Sankt Stefan ob Stainz": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Wettmannstätten": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Groß St. Florian": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Frauental an der Laßnitz": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Bad Gams": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Deutschlandsberg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Schwanberg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "St. Peter im Sulmtal": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "St. Martin im Sulmtal": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Pölfing-Brunn": { "groups": ["neophyten_stmk_gesetz"] },
+    "Wies": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Eibiswald": { "groups": ["neophyten_stmk_gesetz"] },
+    "Söding-Sankt Johann": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Hartberg": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "St. Johann in der Haide": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Stubenberg": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Kaindorf": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Pöllau": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Grafendorf bei Hartberg": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Lafnitz": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Friedberg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Pinggau": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Ilz": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Großwilfersdorf": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Bad Waltersdorf": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Fürstenfeld": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Bad Blumau": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Burgau": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Neudau": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Markt Hartmannsdorf": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Kalsdorf bei Graz": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Werndorf": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Wildon": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Hengsberg": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Allerheiligen bei Wildon": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Sankt Georgen an der Stiefing": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Wolfsberg im Schwarzautal": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Sankt Veit am Vogau": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Gabersdorf": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Leibnitz": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Gralla": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Tillmitsch": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Wagna": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Kitzeck im Sausal": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Gleinstätten": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Heimschuh": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Großklein": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Arnfels": { "groups": ["neophyten_stmk_gesetz"] },
+    "Ehrenhausen an der Weinstraße": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Gamlitz": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Leutschach an der Weinstraße": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Straß in Steiermark": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Mureck": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Leoben": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Niklasdorf": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "St. Stefan ob Leoben": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Kraubath an der Mur": { "groups": ["neophyten_stmk_gesetz"] },
+    "Sankt Michael in Obersteiermark": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Traboch (Timmersdorf)": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Kammern im Liesingtal": { "groups": ["neophyten_stmk_gesetz"] },
+    "Mautern in Steiermark": { "groups": ["neophyten_stmk_gesetz"] },
+    "Kalwang": { "groups": ["neophyten_stmk_gesetz"] },
+    "Wald am Schoberpaß": { "groups": ["neophyten_stmk_gesetz"] },
+    "Eisenerz": { "groups": ["neophyten_stmk_gesetz"] },
+    "St. Peter-Freienstein": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Trofaiach": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Vordernberg": { "groups": ["neophyten_stmk_gesetz"] },
+    "Radmer": { "groups": ["neophyten_stmk_gesetz"] },
+    "Selzthal": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Lassing": { "groups": ["neophyten_stmk_gesetz"] },
+    "Ardning": { "groups": ["neophyten_stmk_gesetz"] },
+    "Admont": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Weißenbach an der Enns": { "groups": ["neophyten_stmk_gesetz"] },
+    "Weng im Gesäuse": { "groups": ["neophyten_stmk_gesetz"] },
+    "Hall bei Admont": { "groups": ["neophyten_stmk_gesetz"] },
+    "Hieflau": { "groups": ["neophyten_stmk_gesetz"] },
+    "Altenmarkt bei Sankt Gallen": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Landl": { "groups": ["neophyten_stmk_gesetz"] },
+    "Wildalpen": { "groups": ["neophyten_stmk_gesetz"] },
+    "Sankt Gallen": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Liezen": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Wörschach": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Aigen im Ennstal": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Stainach-Pürgg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Irdning-Donnersbachtal": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "St. Martin am Grimming": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Öblarn": { "groups": ["neophyten_stmk_gesetz"] },
+    "Stein an der Enns": { "groups": ["neophyten_stmk_gesetz"] },
+    "Gröbming": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Haus im Ennstal": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Aich": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Schladming": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Ramsau am Dachstein": { "groups": ["neophyten_stmk_gesetz"] },
+    "Bad Mitterndorf": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Bad Aussee": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Altaussee": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Grundlsee": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Murau": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "St. Lambrecht": { "groups": ["neophyten_stmk_gesetz"] },
+    "Neumarkt in der Steiermark": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Scheifling": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Teufenbach-Katsch": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Oberwölz": { "groups": ["neophyten_stmk_gesetz"] },
+    "Niederwölz": { "groups": ["neophyten_stmk_gesetz"] },
+    "Ranten": { "groups": ["neophyten_stmk_gesetz"] },
+    "Krakau": { "groups": ["neophyten_stmk_gesetz"] },
+    "Stadl-Predlitz": { "groups": ["neophyten_stmk_gesetz"] },
+    "St. Georgen am Kreischberg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Mühlen": { "groups": ["neophyten_stmk_gesetz"] },
+    "St. Peter am Kammersberg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Judenburg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Knittelfeld": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Spielberg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Zeltweg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Pöls-Oberkurzheim": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Fohnsdorf": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Obdach": { "groups": ["neophyten_stmk_gesetz"] },
+    "Weißkirchen in Steiermark": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Pölstal": { "groups": ["neophyten_stmk_gesetz"] },
+    "Hohentauern": { "groups": ["neophyten_stmk_gesetz"] },
+    "Gaal": { "groups": ["neophyten_stmk_gesetz"] },
+    "Seckau": { "groups": ["neophyten_stmk_gesetz"] },
+    "St. Marein-Feistritz": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "St. Margarethen bei Knittelfeld": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Feldbach": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Bad Gleichenberg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Bad Radkersburg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Fehring": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Gnas": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Straden": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Riegersburg": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Kirchberg an der Raab": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "St. Stefan im Rosental": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Paldau": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Kirchbach-Zerlach": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Jagerberg": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Mettersdorf am Saßbach": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Sankt Peter am Ottersbach": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Halbenrain": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Klöch": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Tieschen": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Kapfenstein": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Edelsbach bei Feldbach": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Eichkögl": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Voitsberg": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Bärnbach": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Köflach": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Maria Lankowitz": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Edelschrott": { "groups": ["neophyten_stmk_gesetz"] },
+    "Hirschegg-Pack": { "groups": ["neophyten_stmk_gesetz"] },
+    "Kainach bei Voitsberg": { "groups": ["neophyten_stmk_gesetz"] },
+    "Krottendorf-Gaisfeld": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Ligist": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Mooskirchen": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Rosental an der Kainach": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Sankt Martin am Wöllmißberg": { "groups": ["neophyten_stmk_gesetz"] },
+    "Weiz": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Gleisdorf": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Puch bei Weiz": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "St. Ruprecht an der Raab": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Anger": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Birkfeld": { "groups": ["neophyten_stmk_gesetz", "bebauungsplan_standard_stmk"] },
+    "Passail": { "groups": ["neophyten_stmk_gesetz"] },
+    "St. Margarethen an der Raab": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Pischelsdorf am Kulm": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Sinabelkirchen": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Floing": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Mortantsch": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste", "bebauungsplan_standard_stmk"] },
+    "Naas": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Thannhausen": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "Gutenberg-Stenzengreith": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] },
+    "St. Kathrein am Offenegg": { "groups": ["neophyten_stmk_gesetz"] },
+    "Gasen": { "groups": ["neophyten_stmk_gesetz"] },
+    "Rettenegg": { "groups": ["neophyten_stmk_gesetz"] },
+    "Strallegg": { "groups": ["neophyten_stmk_gesetz"] },
+    "Miesenbach bei Birkfeld": { "groups": ["neophyten_stmk_gesetz"] },
+    "Ludmannsdorf": { "groups": ["neophyten_stmk_gesetz", "feuerbrand_wirtspflanzen_kernliste"] }
   }
 }
