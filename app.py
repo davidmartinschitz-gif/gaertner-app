@@ -71,6 +71,48 @@ def get_drive_instance():
     return None
 
 
+def save_to_pending(plz, kalk, note):
+    """Speichert einen Änderungswunsch in einer temporären JSON-Datei."""
+    try:
+        data = []
+        if os.path.exists("pending_changes.json"):
+            with open("pending_changes.json", "r") as f:
+                data = json.load(f)
+
+        data.append(
+            {
+                "id": int(time.time()),
+                "plz": plz,
+                "kalk": kalk,
+                "note": note,
+                "status": "ausstehend",
+            }
+        )
+        with open("pending_changes.json", "w") as f:
+            json.dump(data, f)
+        return True
+    except:
+        return False
+
+
+def save_to_master(plz, kalk, note):
+    """Schreibt Daten direkt in die Master-SQLite auf Laufwerk E:."""
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            conn.execute(
+                "INSERT INTO boden_daten (plz, kalkgehalt, bodentyp) VALUES (?, ?, ?)",
+                (plz, 1 if kalk else 0, note),
+            )
+        return True
+    except Exception as e:
+        st.error(f"Datenbankfehler: {e}")
+        return False
+
+
+# Danach folgt dann dein bestehender Code:
+def load_prohibitions(): ...
+
+
 def load_prohibitions():
     """Lädt das Verbotsregister sicher in den Session State."""
     if "prohibitions" not in st.session_state:
@@ -140,41 +182,28 @@ def check_prohibition(gemeinde_name, pflanze_suche):
     register = st.session_state.get("prohibitions", {})
     if not register:
         return None
-
-    munis = register.get("municipalities", {})
-    muni_key = next(
-        (
-            k
-            for k in munis
-            if k.strip().lower() in gemeinde_name.lower()
-            or gemeinde_name.lower() in k.lower()
-        ),
-        None,
-    )
-    if not muni_key:
+    muni_data = register.get("municipalities", {}).get(gemeinde_name)
+    if not muni_data:
         return None
 
-    muni_data = munis[muni_key]
-    suche = pflanze_suche.lower().strip()
+    suche = pflanze_suche.lower()
 
-    # 1. Prüfe lokale Sonderregeln
+    # 1. Lokale Regeln (z.B. Thuja-Heckenverordnung)
     custom_rules = muni_data.get("custom_rules", {})
     for verbot_name, details in custom_rules.items():
-        # LOGIK-FIX: Ist das Suchwort im Namen der Regel?
-        if suche in verbot_name.lower():
+        if suche in verbot_name.lower():  # Logik-Fix: Suche IM Verbotsnamen
             return details
 
-    # 2. Prüfe abonnierte globale Gruppen (Hier steckt Thuja oft drin!)
+    # 2. Gruppen (z.B. Bebauungsplan)
     groups_to_check = muni_data.get("groups", [])
     global_groups = register.get("global_groups", {})
-
     for group_key in groups_to_check:
         group = global_groups.get(group_key)
         if group:
             for p_entry in group.get("plants", []):
-                # LOGIK-FIX: Ist das Suchwort in der Pflanzenliste der Gruppe?
                 if suche in p_entry.lower():
                     return {
+                        "status": "verboten",
                         "grund": f"{group.get('name')}: {group.get('grund')}",
                         "quelle": group.get("quelle"),
                     }
@@ -312,16 +341,73 @@ elif page == "Pflanzen-Experte":
 
 # --- SEITE: BODEN-VERWALTUNG ---
 elif page == "Boden-Verwaltung":
-    st.title("📊 Datenbank-Einsicht")
+    st.title("📊 Boden-Management & Kontrolle")
+
+    # 1. ADMIN-BEREICH (Nur sichtbar auf deiner Workstation)
+    if IS_LOCAL:
+        with st.expander("🛠️ Admin-Panel: Ausstehende Änderungen prüfen", expanded=True):
+            if os.path.exists("pending_changes.json"):
+                with open("pending_changes.json", "r") as f:
+                    pending = json.load(f)
+
+                if not pending:
+                    st.write("Keine neuen Vorschläge vorhanden.")
+
+                for item in pending:
+                    col_a, col_b, col_c = st.columns([3, 1, 1])
+                    with col_a:
+                        st.write(
+                            f"**PLZ {item['plz']}**: {item['note']} (Kalk: {item['kalk']})"
+                        )
+                    with col_b:
+                        if st.button("✅ Ja", key=f"app_{item['id']}"):
+                            save_to_master(item["plz"], item["kalk"], item["note"])
+                            pending.remove(item)
+                            with open("pending_changes.json", "w") as f:
+                                json.dump(pending, f)
+                            st.rerun()
+                    with col_c:
+                        if st.button("❌ Nein", key=f"rej_{item['id']}"):
+                            pending.remove(item)
+                            with open("pending_changes.json", "w") as f:
+                                json.dump(pending, f)
+                            st.rerun()
+            else:
+                st.write("Keine Vorschläge in der Warteschlange.")
+
+    st.divider()
+
+    # 2. EINGABE-FORMULAR (Für PC und Handy)
+    st.subheader("➕ Neuen Bodenwert erfassen")
+    with st.form("boden_form"):
+        f_plz = st.text_input("PLZ", "8160")
+        f_kalk = st.checkbox("Kalkhaltiger Boden?")
+        f_note = st.text_input("Anmerkung (z.B. Straßenecke)")
+
+        submit = st.form_submit_button("Eintrag speichern / vorschlagen")
+
+        if submit:
+            if not IS_LOCAL:
+                # Mobil-Nutzer schreibt in 'pending'
+                if save_to_pending(f_plz, f_kalk, f_note):
+                    st.info(
+                        "✅ Vorschlag wurde zur Prüfung an die Workstation gesendet."
+                    )
+            else:
+                # Du am PC darfst direkt schreiben
+                if save_to_master(f_plz, f_kalk, f_note):
+                    st.success(f"✅ Daten direkt auf SSD (E:) gespeichert.")
+
+    # 3. DATEN-EINSICHT (Master-Tabelle)
+    st.subheader("📂 Aktuelle Master-Datenbank")
     if os.path.exists(DB_PATH):
         try:
             with sqlite3.connect(DB_PATH) as conn:
                 df = pd.read_sql_query("SELECT * FROM boden_daten", conn)
                 st.dataframe(df, use_container_width=True)
-        except Exception as e:
-            st.warning(f"Tabelle nicht lesbar: {e}")
-    else:
-        st.info("Keine SQLite-Datenbank auf E: gefunden.")
+        except:
+            st.info("Datenbank noch leer.")
+
 
 # --- SEITE: GARTEN-KARTE ---
 elif page == "Garten-Karte":

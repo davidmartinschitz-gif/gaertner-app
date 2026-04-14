@@ -1319,18 +1319,26 @@ def check_plant(plant_id, is_protection_area, plz=""):
         return "Fehler: Pflanze nicht gefunden."
 
     name_display = f"{info['de']} ({info['lat']})"
+    lat_name = info.get("lat", "").lower()
 
-    # Check 1: Feuerbrand-Logik für Steiermark (PLZ beginnt mit 8)
+    # --- 1. MODERNE FEUERBRAND-LOGIK (Stand 2026) ---
     if is_protection_area and info.get("fire_blight_risk"):
         if str(plz).startswith("8"):
-            return f"🚫 PFLANZVERBOT: '{name_display}' ist in der Steiermark (Schutzgebiet) aufgrund von Feuerbrand untersagt!"
+            # AUSNAHME: Malus (Apfel/Zierapfel) & Pyrus (Birne) sind wieder erlaubt
+            # Nur Cotoneaster, Crataegus und Pyracantha bleiben strikt verboten
+            if "malus" in lat_name or "pyrus" in lat_name:
+                return f"⚠️ HINWEIS: '{name_display}' ist ein Feuerbrand-Wirt. Pflanzung in der Steiermark erlaubt, aber meldepflichtig bei Befall!"
+
+            # Die echte Verbotsliste (Kernliste)
+            return f"🚫 PFLANZVERBOT: '{name_display}' ist in der Steiermark aufgrund der Feuerbrand-Verordnung (Kernliste) untersagt!"
+
         return f"⚠️ GEFAHR: '{name_display}' ist ein Feuerbrand-Wirt!"
 
     # Check 2: Einschränkungen/Hinweise
     if "restriction" in info:
         return f"ℹ️ INFO: {info['restriction']}"
 
-    return f"✅ OK: {info.get('note', 'Für diesen Standort geeignet.')}"
+    return "✅ Geeignet: Keine spezifischen Pflanzverbote bekannt."
 
 
 def get_restricted_plants(is_protection_area):
