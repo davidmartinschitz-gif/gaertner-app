@@ -780,7 +780,7 @@ PLANTS_REGISTRY = {
     "delphinium": {
         "de": "Rittersporn", "lat": "Delphinium",
         "needs_acid_soil": False, "wind_resistence": "gering", "drought_tolerance": "mittel",
-        "restriction": "Giftig. Braucht viele Nährstoffe und Stützen.",
+        "restriction": "Giftig. Braucht viele Nährstoffe und Stützen. Bauerngartenstaude",
     },
     "echinacea_purpurea": {
         "de": "Purpur-Sonnenhut", "lat": "Echinacea purpurea",
@@ -870,7 +870,7 @@ PLANTS_REGISTRY = {
     "paeonia_lactiflora": {
         "de": "Pfingstrose", "lat": "Paeonia lactiflora",
         "needs_acid_soil": False, "wind_resistence": "gering", "drought_tolerance": "mittel",
-        "note": "Extrem langlebig, mag keine Umpflanzung.",
+        "note": "Extrem langlebig, mag keine Umpflanzung. Nährstoffhungrig. Bauerngartenstaude.",
     },
     "papaver_orientale": {
         "de": "Türkenmohn", "lat": "Papaver orientale",
@@ -976,7 +976,7 @@ PLANTS_REGISTRY = {
     },
     "dryopteris_filix_mas": {
         "de": "Wurmfarn", "lat": "Dryopteris filix-mas", "native": True,
-        "needs_acid_soil": False, "wind_resistence": "hoch", "drought_tolerance": "mittel",
+        "needs_acid_soil": True, "wind_resistence": "hoch", "drought_tolerance": "mittel",
         "note": "Der Klassiker unter den Farnen, extrem winterhart und robust.",
     },
     "epimedium": {

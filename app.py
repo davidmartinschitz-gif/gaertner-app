@@ -455,15 +455,52 @@ elif page == "Pflanzen-Experte":
             p_id_final = sel_tuple[1]
             st.subheader(f"🌿 Analyse für: {sel_tuple[0]}")
 
+            # 1. Daten abrufen
+            plant_info = plants_data.PLANTS_REGISTRY[p_id_final]
+            is_kalk, src = get_soil_status(plz_in)
+
+            # 2. Anzeige in zwei Spalten
             res_a, res_b = st.columns([2, 1])
+
             with res_a:
+                # Allgemeiner Check (Feuerbrand etc.)
                 st.write(plants_data.check_plant(p_id_final, True, plz_in))
+
+                # DER NEUE BODEN-VERGLEICH (Logik-Brücke)
+                if plant_info.get("needs_acid_soil") and is_kalk:
+                    st.error(
+                        "🚨 BODEN-KONFLIKT: Diese Pflanze benötigt sauren Boden (Moorbeet)!"
+                    )
+                    st.warning(
+                        f"Dein Standort ({plz_in}) ist laut {src} kalkhaltig. Ohne Bodenaustausch wird die Pflanze hier kümmern."
+                    )
+                elif plant_info.get("needs_acid_soil") and not is_kalk:
+                    st.success(
+                        "✨ Boden-Match: Die Pflanze liebt deinen sauren/neutralen Boden!"
+                    )
+
             with res_b:
-                is_kalk, src = get_soil_status(plz_in)
-                st.metric("Boden", "Kalkhaltig" if is_kalk else "Sauer/Neutral")
+                # 1. Boden-Status
+                st.metric(
+                    "Boden am Standort", "Kalkhaltig" if is_kalk else "Sauer/Neutral"
+                )
+
+                # 2. Trockenheitstoleranz
+                dt = plant_info.get("drought_tolerance", "k.A.")
+                if dt.lower() in ["hoch", "extrem"]:
+                    st.metric("Trocken-Toleranz", dt.capitalize(), delta="Klimafit")
+                else:
+                    st.metric("Trocken-Toleranz", dt.capitalize())
+
+                # 3. Windfestigkeit
+                # Nutzt den Schlüssel 'wind_resistence' aus dem Lexikon
+                wr = plant_info.get("wind_resistence", "k.A.")
+                if wr.lower() == "hoch":
+                    st.metric("Windfestigkeit", wr.capitalize(), delta="Sturmfest")
+                else:
+                    st.metric("Windfestigkeit", wr.capitalize())
+
                 st.caption(f"Quelle: {src}")
-        else:
-            st.info(f"Keine Treffer für '{query}' gefunden.")
 
 # --- SEITE: BODEN-VERWALTUNG ---
 elif page == "Boden-Verwaltung":
@@ -505,10 +542,11 @@ elif page == "Boden-Verwaltung":
                                     item["humus"],
                                     item.get("note", ""),
                                 ):
-
                                     pending.remove(item)
                                     with open("pending_changes.json", "w") as f:
                                         json.dump(pending, f)
+
+                                    upload_all_to_drive()  # <--- 1. Cloud-Fix nach Annahme
                                     st.rerun()
                         with col_c:
                             if st.button(
@@ -517,9 +555,9 @@ elif page == "Boden-Verwaltung":
                                 pending.remove(item)
                                 with open("pending_changes.json", "w") as f:
                                     json.dump(pending, f)
+
+                                upload_all_to_drive()  # <--- 2. Cloud-Fix nach Ablehnung
                                 st.rerun()
-            else:
-                st.write("Keine Vorschläge in der Warteschlange.")
 
     st.divider()
 
