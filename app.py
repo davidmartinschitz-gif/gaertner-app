@@ -5,6 +5,7 @@ import pandas as pd
 import json
 import time
 import h3
+import requests
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 from streamlit_js_eval import get_geolocation
@@ -14,6 +15,19 @@ import folium
 # --- DEINE EIGENEN MODULE ---
 import plants_data
 import history_module
+
+# --- DESIGN & STYLING ---
+st.markdown(
+    """
+    <style>
+    .stApp { background-color: #0e1117; color: #ffffff; }
+    .stButton>button { border-radius: 5px; border: 1px solid #4CAF50; background-color: #1e2630; color: white; }
+    .stTextInput>div>div>input { background-color: #262730; color: white; }
+    .stMetric { background-color: #161b22; border: 1px solid #333; padding: 15px; border-radius: 10px; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 # --- 1. GLOBALE KONFIGURATION ---
 IS_LOCAL = os.path.exists(r"E:\Database")
@@ -274,41 +288,52 @@ page = st.sidebar.radio(
 
 # --- SEITE: DASHBOARD ---
 if page == "Dashboard":
-    st.title("🌱 Gärtner-Master Dashboard")
+    st.title("🏡 Gärtner-Master Dashboard")
     st.info(
         f"**Prozessor:** AMD Ryzen 7 2700X | **Lager:** Kingston HyperX Predator M.2 SSD"
     )
 
+    # 1. Wetter-Daten abrufen (Open-Meteo, keine API-Key nötig)
+    temp, weather_desc = "N/A", "Unbekannt"
+    try:
+        # Koordinaten für deine Home-Base (Preding/Mortantsch Bereich)
+        w_url = "https://api.open-meteo.com/v1/forecast?latitude=47.19&longitude=15.64&current_weather=true"
+        w_res = requests.get(w_url, timeout=5).json()
+        w_data = w_res["current_weather"]
+        temp = w_data["temperature"]
+    except:
+        pass
+
+    # 2. Status-Metriken
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("Lexikon", f"{len(plants_data.PLANTS_REGISTRY)} Einträge")
+        st.metric(
+            "Außentemperatur",
+            f"{temp} °C",
+            delta="Frostgefahr!" if isinstance(temp, float) and temp < 2 else None,
+        )
     with col2:
-        st.success("Datenbank bereit" if IS_LOCAL else "Cloud-Spiegel aktiv")
+        st.metric("Lexikon", f"{len(plants_data.PLANTS_REGISTRY)} Einträge")
     with col3:
         if os.path.exists(BACKUP_INFO_PATH):
             with open(BACKUP_INFO_PATH, "r") as f:
                 st.metric("Letztes Backup", f.read())
 
+    st.success(
+        "System: Workstation (E:) bereit" if IS_LOCAL else "System: Cloud-Spiegel aktiv"
+    )
+
     st.divider()
     if st.button("🔄 Volle Synchronisierung (Cloud ↔ PC)"):
         with st.spinner("Synchronisiere mit Google Drive..."):
-            # 1. Daten vom Handy/Cloud abholen (Pull)
             pull_erfolg = sync_from_drive()
-
-            # 2. Eigene Daten hochladen (Push)
             erfolg, msg = upload_all_to_drive()
-
             if pull_erfolg and erfolg:
-                st.success(
-                    "✅ Synchronisierung abgeschlossen: Neue Vorschläge geladen und Master-Daten gesichert!"
-                )
-                st.rerun()  # Seite neu laden, um Admin-Panel zu aktualisieren
-            elif erfolg:
-                st.warning(
-                    "⚠️ Master-Daten gesichert, aber keine neuen Vorschläge in der Cloud gefunden."
-                )
+                st.success("✅ Synchronisierung abgeschlossen: Vorschläge geladen!")
+                st.rerun()
             else:
                 st.error(msg)
+
 
 # --- SEITE: PFLANZEN-EXPERTE ---
 elif page == "Pflanzen-Experte":
@@ -365,6 +390,13 @@ elif page == "Pflanzen-Experte":
 # --- SEITE: BODEN-VERWALTUNG ---
 elif page == "Boden-Verwaltung":
     st.title("📊 Boden-Management & Kontrolle")
+
+    search_plz = st.text_input(
+        "🔍 Offizielle Boden-Info suchen (PLZ):", placeholder="z.B. 8160"
+    )
+    if search_plz in ebod_db:
+        atlas_info = ebod_db[search_plz]
+        st.info(f"**eBOD-Atlas Info für {search_plz}:** {atlas_info}")
 
     # 1. ADMIN-BEREICH (Sichtbar auf deiner Workstation)
     if IS_LOCAL:
