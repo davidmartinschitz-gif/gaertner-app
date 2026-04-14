@@ -95,13 +95,13 @@ def save_to_pending(plz, kalk, typ, humus, note):
         return False
 
 
-def save_to_master(plz, kalk, typ, humus):
-    """Schreibt alle Spalten direkt in die Master-SQLite auf E:."""
+def save_to_master(plz, kalk, typ, humus, note):  # note hinzugefügt
     try:
         with sqlite3.connect(DB_PATH) as conn:
+            # Hier jetzt mit 5 Spalten inklusive bemerkung
             conn.execute(
-                "INSERT INTO boden_daten (plz, kalkgehalt, bodentyp, humusgehalt) VALUES (?, ?, ?, ?)",
-                (plz, kalk, typ, humus),
+                "INSERT INTO boden_daten (plz, kalkgehalt, bodentyp, humusgehalt, bemerkung) VALUES (?, ?, ?, ?, ?)",
+                (plz, kalk, typ, humus, note),
             )
         return True
     except:
@@ -188,10 +188,14 @@ def check_prohibition(gemeinde_name, pflanze_suche):
     register = st.session_state.get("prohibitions", {})
     if not register:
         return None
-    muni_data = register.get("municipalities", {}).get(gemeinde_name)
-    if not muni_data:
+    munis = register.get("municipalities", {})
+    # Sucht den passenden Eintrag, egal ob Groß/Kleinschreibung oder Leerzeichen
+    muni_key = next(
+        (k for k in munis if k.strip().lower() == gemeinde_name.strip().lower()), None
+    )
+    if not muni_key:
         return None
-
+    muni_data = munis[muni_key]
     suche = pflanze_suche.lower()
 
     # 1. Lokale Regeln (z.B. Thuja-Heckenverordnung)
@@ -239,8 +243,8 @@ def get_soil_status(plz_input):
 st.set_page_config(page_title="Gärtner-Master 2026", page_icon="🌱", layout="wide")
 load_prohibitions()
 
-# Einmaliger Cloud-Sync (Schutz gegen Dauerschleife)
-if not IS_LOCAL and "cloud_synced" not in st.session_state:
+# Synchronisiert jetzt IMMER beim Starten (auch am PC), um Vorschläge zu finden
+if "cloud_synced" not in st.session_state:
     if sync_from_drive():
         st.session_state["cloud_synced"] = True
 
@@ -286,12 +290,25 @@ if page == "Dashboard":
                 st.metric("Letztes Backup", f.read())
 
     st.divider()
-    if st.button("🚀 Jetzt Cloud-Backup starten"):
-        erfolg, msg = upload_all_to_drive()
-        if erfolg:
-            st.success(msg)
-        else:
-            st.error(msg)
+    if st.button("🔄 Volle Synchronisierung (Cloud ↔ PC)"):
+        with st.spinner("Synchronisiere mit Google Drive..."):
+            # 1. Daten vom Handy/Cloud abholen (Pull)
+            pull_erfolg = sync_from_drive()
+
+            # 2. Eigene Daten hochladen (Push)
+            erfolg, msg = upload_all_to_drive()
+
+            if pull_erfolg and erfolg:
+                st.success(
+                    "✅ Synchronisierung abgeschlossen: Neue Vorschläge geladen und Master-Daten gesichert!"
+                )
+                st.rerun()  # Seite neu laden, um Admin-Panel zu aktualisieren
+            elif erfolg:
+                st.warning(
+                    "⚠️ Master-Daten gesichert, aber keine neuen Vorschläge in der Cloud gefunden."
+                )
+            else:
+                st.error(msg)
 
 # --- SEITE: PFLANZEN-EXPERTE ---
 elif page == "Pflanzen-Experte":
@@ -376,7 +393,9 @@ elif page == "Boden-Verwaltung":
                                     item["kalk"],
                                     item["typ"],
                                     item["humus"],
+                                    item.get("note", ""),
                                 ):
+
                                     pending.remove(item)
                                     with open("pending_changes.json", "w") as f:
                                         json.dump(pending, f)
@@ -420,7 +439,7 @@ elif page == "Boden-Verwaltung":
                     )
             else:
                 # Du am PC schreibst direkt auf Laufwerk E:
-                if save_to_master(f_plz, f_kalk, f_typ, f_humus):
+                if save_to_master(f_plz, f_kalk, f_typ, f_humus, f_note):
                     st.success(f"✅ Daten direkt auf Kingston SSD (E:) gespeichert.")
 
     # 3. DATEN-EINSICHT (Master-Tabelle)
