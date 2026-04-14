@@ -16,14 +16,39 @@ import folium
 import plants_data
 import history_module
 
-# --- DESIGN & STYLING ---
+# --- DESIGN & STYLING (Update: Deep Forest & Glassmorphism) ---
 st.markdown(
     """
     <style>
-    .stApp { background-color: #0e1117; color: #ffffff; }
-    .stButton>button { border-radius: 5px; border: 1px solid #4CAF50; background-color: #1e2630; color: white; }
-    .stTextInput>div>div>input { background-color: #262730; color: white; }
-    .stMetric { background-color: #161b22; border: 1px solid #333; padding: 15px; border-radius: 10px; }
+    /* 1. Fundament: Der Deep Forest Hintergrundverlauf (Dunkelgrün -> Schwarz) */
+    .stApp {
+        background: linear-gradient(135deg, #051905 0%, #0c1016 100%);
+        color: #ecf0f1;
+    }
+
+    /* 2. Glassmorphismus-Effekt für Karten/Metriken (Dashboard) */
+    div[data-testid="stMetric"] {
+        background: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 15px !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 3. Glassmorphismus für Info-Boxen und Aufklapp-Menüs (Admin/Atlas) */
+    .stAlert, .streamlit-expanderHeader {
+        background: rgba(255, 255, 255, 0.03) !important;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 10px;
+    }
+
+    /* 4. Konsistentes Styling für Buttons und Eingabefelder */
+    .stButton>button { border-radius: 8px; border: 1px solid #4CAF50; background-color: transparent; color: white; transition: 0.3s; }
+    .stButton>button:hover { background-color: #4CAF50; color: black; }
+    .stTextInput>div>div>input { background-color: rgba(0, 0, 0, 0.3) !important; color: white !important; }
+    .stSelectbox>div>div>div { background-color: rgba(0, 0, 0, 0.3) !important; color: white !important; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -83,6 +108,45 @@ def get_drive_instance():
     except:
         pass
     return None
+
+
+import base64
+
+
+def get_base64_image(image_path):
+    import os
+
+    if not os.path.exists(image_path):
+        # Falls das Bild nicht gefunden wird, geben wir eine Info aus
+        return None
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+
+
+def add_footer(user_name="David Martinschitz"):
+    logo_path = "Screenshot 2026-04-14 130505.jpg"
+    img_base64 = get_base64_image(logo_path)
+
+    # HTML Grundgerüst
+    footer_style = "position: relative; margin-top: 50px; padding: 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1);"
+
+    if img_base64:
+        # Wenn Bild vorhanden: Logo + Name
+        logo_html = f'<img src="data:image/jpeg;base64,{img_base64}" style="width: 80px; filter: brightness(1.2); margin-bottom: 10px;">'
+    else:
+        # Fallback: Nur ein dezentes Icon, falls das Bild lokal/cloud fehlt
+        logo_html = '<p style="font-size: 2rem;">🌿</p>'
+
+    st.markdown(
+        f"""
+        <div style="{footer_style}">
+            <p style="color: rgba(255,255,255,0.4); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Powered by:</p>
+            {logo_html}
+            <p style="color: #4CAF50; font-weight: bold; font-family: 'Courier New', monospace; margin-top: 5px;">{user_name}</p>
+        </div>
+    """,
+        unsafe_allow_html=True,
+    )
 
 
 def save_to_pending(plz, kalk, typ, humus, note):
@@ -254,8 +318,11 @@ def get_soil_status(plz_input):
 
 
 # --- 3. INITIALISIERUNG ---
-st.set_page_config(page_title="Gärtner-Master 2026", page_icon="🌱", layout="wide")
-load_prohibitions()
+st.set_page_config(
+    page_title="Gärtner-Master 2026",
+    page_icon="Screenshot 2026-04-14 130505.jpg",  # Hier wird dein Logo zum Tab-Icon
+    layout="wide",
+)
 
 # Synchronisiert jetzt IMMER beim Starten (auch am PC), um Vorschläge zu finden
 if "cloud_synced" not in st.session_state:
@@ -288,41 +355,53 @@ page = st.sidebar.radio(
 
 # --- SEITE: DASHBOARD ---
 if page == "Dashboard":
-    st.title("🏡 Gärtner-Master Dashboard")
-    st.info(
-        f"**Prozessor:** AMD Ryzen 7 2700X | **Lager:** Kingston HyperX Predator M.2 SSD"
-    )
+    st.title("🌿 Gärtner-Master Dashboard")
+    # Hardware-Info wurde hier entfernt :)
 
-    # 1. Wetter-Daten abrufen (Open-Meteo, keine API-Key nötig)
-    temp, weather_desc = "N/A", "Unbekannt"
+    # 1. STANDORT-LOGIK (Dynamisch)
+    loc = get_geolocation()
+    if loc and "coords" in loc:
+        lat = loc["coords"]["latitude"]
+        lon = loc["coords"]["longitude"]
+        status_text = "📍 Standort: Live (GPS)"
+    else:
+        # Fallback auf Baumschulgasse 2, 8160 Preding
+        lat, lon = 47.2001, 15.6515
+        status_text = "🏠 Standort: Home-Base (Preding)"
+
+    # 2. WETTER-ABFRAGE basierend auf Koordinaten
+    temp = "N/A"
     try:
-        # Koordinaten für deine Home-Base (Preding/Mortantsch Bereich)
-        w_url = "https://api.open-meteo.com/v1/forecast?latitude=47.19&longitude=15.64&current_weather=true"
+        w_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
         w_res = requests.get(w_url, timeout=5).json()
         w_data = w_res["current_weather"]
         temp = w_data["temperature"]
     except:
         pass
 
-    # 2. Status-Metriken
+    # 3. STATUS-METRIKEN (Glassmorphism-Design aktiv)
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric(
-            "Außentemperatur",
+            "Lokal-Temperatur",
             f"{temp} °C",
-            delta="Frostgefahr!" if isinstance(temp, float) and temp < 2 else None,
+            delta=(
+                "Frostgefahr!" if isinstance(temp, (int, float)) and temp < 2 else None
+            ),
         )
     with col2:
-        st.metric("Lexikon", f"{len(plants_data.PLANTS_REGISTRY)} Einträge")
+        st.metric("Lexikon", f"{len(plants_data.PLANTS_REGISTRY)} Pflanzen")
     with col3:
         if os.path.exists(BACKUP_INFO_PATH):
             with open(BACKUP_INFO_PATH, "r") as f:
                 st.metric("Letztes Backup", f.read())
 
     st.success(
-        "System: Workstation (E:) bereit" if IS_LOCAL else "System: Cloud-Spiegel aktiv"
+        "System: Workstation bereit" if IS_LOCAL else "System: Cloud-Spiegel aktiv"
     )
+    st.caption(status_text)
 
+    # 4. SYNCHRONISIERUNG
     st.divider()
     if st.button("🔄 Volle Synchronisierung (Cloud ↔ PC)"):
         with st.spinner("Synchronisiere mit Google Drive..."):
@@ -333,7 +412,6 @@ if page == "Dashboard":
                 st.rerun()
             else:
                 st.error(msg)
-
 
 # --- SEITE: PFLANZEN-EXPERTE ---
 elif page == "Pflanzen-Experte":
@@ -389,7 +467,7 @@ elif page == "Pflanzen-Experte":
 
 # --- SEITE: BODEN-VERWALTUNG ---
 elif page == "Boden-Verwaltung":
-    st.title("📊 Boden-Management & Kontrolle")
+    st.title("📊 Boden-Management & Analyse")
 
     search_plz = st.text_input(
         "🔍 Offizielle Boden-Info suchen (PLZ):", placeholder="z.B. 8160"
@@ -506,3 +584,6 @@ elif page == "Garten-Karte":
     m = folium.Map(location=[lat, lon], zoom_start=18)
     folium.Marker([lat, lon]).add_to(m)
     st_folium(m, width=700, height=450)
+
+# --- GLOBALER FOOTER (Am Ende der Datei) ---
+add_footer("David Martinschitz")  # Hier deinen echten Namen eintragen
