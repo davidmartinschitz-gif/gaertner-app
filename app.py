@@ -206,24 +206,50 @@ def load_prohibitions():
 
 
 def sync_from_drive():
-    """Lädt DB, Atlas UND ausstehende Änderungen aus der Cloud."""
+    """Lädt DB und Atlas, mergt aber die Vorschläge (Pending Changes) statt sie zu löschen."""
     try:
         drive = get_drive_instance()
         if not drive:
             return False
 
-        # NEU: pending_changes.json in die Liste aufgenommen
-        files = {
+        # 1. Master-Daten normal überschreiben (DB & Atlas)
+        master_files = {
             "boden_austria_backup.db": DB_PATH,
             "ebod_atlas_backup.json": ATLAS_PATH,
-            "pending_changes.json": "pending_changes.json",
         }
-        for title, target in files.items():
+        for title, target in master_files.items():
             file_list = drive.ListFile(
                 {"q": f"title = '{title}' and trashed = false"}
             ).GetList()
             if file_list:
                 file_list[0].GetContentFile(target)
+
+        # 2. VETO-LISTE MERGEN (Die Lösung für dein Problem)
+        title = "pending_changes.json"
+        file_list = drive.ListFile(
+            {"q": f"title = '{title}' and trashed = false"}
+        ).GetList()
+        if file_list:
+            # Cloud-Daten als Text holen und in Liste umwandeln
+            cloud_content = file_list[0].GetContentString()
+            cloud_data = json.loads(cloud_content) if cloud_content else []
+
+            # Lokale Daten (vom Handy/PC) laden
+            local_data = []
+            if os.path.exists("pending_changes.json"):
+                with open("pending_changes.json", "r") as f:
+                    local_data = json.load(f)
+
+            # Mergen: Nur Einträge hinzufügen, die wir lokal noch nicht haben (ID-Check)
+            local_ids = {item["id"] for item in local_data if "id" in item}
+            for item in cloud_data:
+                if item.get("id") not in local_ids:
+                    local_data.append(item)
+
+            # Die kombinierte Liste lokal speichern
+            with open("pending_changes.json", "w") as f:
+                json.dump(local_data, f)
+
         return True
     except Exception as e:
         return False
