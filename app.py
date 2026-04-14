@@ -71,21 +71,21 @@ def get_drive_instance():
     return None
 
 
-def save_to_pending(plz, kalk, note):
-    """Speichert einen Änderungswunsch in einer temporären JSON-Datei."""
+def save_to_pending(plz, kalk, typ, humus, note):
+    """Speichert Detail-Werte vom Handy in die Veto-Liste."""
     try:
         data = []
         if os.path.exists("pending_changes.json"):
             with open("pending_changes.json", "r") as f:
                 data = json.load(f)
-
         data.append(
             {
                 "id": int(time.time()),
                 "plz": plz,
                 "kalk": kalk,
+                "typ": typ,
+                "humus": humus,
                 "note": note,
-                "status": "ausstehend",
             }
         )
         with open("pending_changes.json", "w") as f:
@@ -95,17 +95,16 @@ def save_to_pending(plz, kalk, note):
         return False
 
 
-def save_to_master(plz, kalk, note):
-    """Schreibt Daten direkt in die Master-SQLite auf Laufwerk E:."""
+def save_to_master(plz, kalk, typ, humus):
+    """Schreibt alle Spalten direkt in die Master-SQLite auf E:."""
     try:
         with sqlite3.connect(DB_PATH) as conn:
             conn.execute(
-                "INSERT INTO boden_daten (plz, kalkgehalt, bodentyp) VALUES (?, ?, ?)",
-                (plz, 1 if kalk else 0, note),
+                "INSERT INTO boden_daten (plz, kalkgehalt, bodentyp, humusgehalt) VALUES (?, ?, ?, ?)",
+                (plz, kalk, typ, humus),
             )
         return True
-    except Exception as e:
-        st.error(f"Datenbankfehler: {e}")
+    except:
         return False
 
 
@@ -129,14 +128,17 @@ def load_prohibitions():
 
 
 def sync_from_drive():
-    """Download-Logik für den Cloud-Start."""
+    """Lädt DB, Atlas UND ausstehende Änderungen aus der Cloud."""
     try:
         drive = get_drive_instance()
         if not drive:
             return False
+
+        # NEU: pending_changes.json in die Liste aufgenommen
         files = {
             "boden_austria_backup.db": DB_PATH,
             "ebod_atlas_backup.json": ATLAS_PATH,
+            "pending_changes.json": "pending_changes.json",
         }
         for title, target in files.items():
             file_list = drive.ListFile(
@@ -145,19 +147,22 @@ def sync_from_drive():
             if file_list:
                 file_list[0].GetContentFile(target)
         return True
-    except:
+    except Exception as e:
         return False
 
 
 def upload_all_to_drive():
-    """Cloud-Backup vom lokalen System."""
+    """Sichert alle lokalen Daten inklusive der Veto-Liste in die Cloud."""
     try:
         drive = get_drive_instance()
         if not drive:
             return False, "❌ Verbindung fehlgeschlagen (Auth fehlt)."
+
+        # NEU: Auch hier die Veto-Datei mitsynchronisieren
         files_to_sync = {
             "boden_austria_backup.db": DB_PATH,
             "ebod_atlas_backup.json": ATLAS_PATH,
+            "pending_changes.json": "pending_changes.json",
         }
         count = 0
         for title, path in files_to_sync.items():
@@ -171,9 +176,10 @@ def upload_all_to_drive():
                 file_drive.SetContentFile(path)
                 file_drive.Upload()
                 count += 1
+
         with open(BACKUP_INFO_PATH, "w") as f:
             f.write(pd.Timestamp.now().strftime("%d.%m.%Y %H:%M:%S"))
-        return True, f"✅ Backup abgeschlossen ({count} Dateien)."
+        return True, f"✅ Sync abgeschlossen ({count} Dateien)."
     except Exception as e:
         return False, f"❌ Cloud-Fehler: {str(e)}"
 
@@ -343,7 +349,7 @@ elif page == "Pflanzen-Experte":
 elif page == "Boden-Verwaltung":
     st.title("📊 Boden-Management & Kontrolle")
 
-    # 1. ADMIN-BEREICH (Nur sichtbar auf deiner Workstation)
+    # 1. ADMIN-BEREICH (Sichtbar auf deiner Workstation)
     if IS_LOCAL:
         with st.expander("🛠️ Admin-Panel: Ausstehende Änderungen prüfen", expanded=True):
             if os.path.exists("pending_changes.json"):
@@ -352,51 +358,70 @@ elif page == "Boden-Verwaltung":
 
                 if not pending:
                     st.write("Keine neuen Vorschläge vorhanden.")
-
-                for item in pending:
-                    col_a, col_b, col_c = st.columns([3, 1, 1])
-                    with col_a:
-                        st.write(
-                            f"**PLZ {item['plz']}**: {item['note']} (Kalk: {item['kalk']})"
-                        )
-                    with col_b:
-                        if st.button("✅ Ja", key=f"app_{item['id']}"):
-                            save_to_master(item["plz"], item["kalk"], item["note"])
-                            pending.remove(item)
-                            with open("pending_changes.json", "w") as f:
-                                json.dump(pending, f)
-                            st.rerun()
-                    with col_c:
-                        if st.button("❌ Nein", key=f"rej_{item['id']}"):
-                            pending.remove(item)
-                            with open("pending_changes.json", "w") as f:
-                                json.dump(pending, f)
-                            st.rerun()
+                else:
+                    for item in pending:
+                        st.info(f"**Vorschlag für PLZ {item.get('plz')}**")
+                        col_a, col_b, col_c = st.columns([3, 1, 1])
+                        with col_a:
+                            st.write(
+                                f"Typ: {item.get('typ')} | Kalk: {item.get('kalk')} | Humus: {item.get('humus')}"
+                            )
+                            st.caption(f"Notiz: {item.get('note', 'Keine Notiz')}")
+                        with col_b:
+                            if st.button(
+                                "✅ Ja", key=f"app_{item.get('id', time.time())}"
+                            ):
+                                if save_to_master(
+                                    item["plz"],
+                                    item["kalk"],
+                                    item["typ"],
+                                    item["humus"],
+                                ):
+                                    pending.remove(item)
+                                    with open("pending_changes.json", "w") as f:
+                                        json.dump(pending, f)
+                                    st.rerun()
+                        with col_c:
+                            if st.button(
+                                "❌ Nein", key=f"rej_{item.get('id', time.time())}"
+                            ):
+                                pending.remove(item)
+                                with open("pending_changes.json", "w") as f:
+                                    json.dump(pending, f)
+                                st.rerun()
             else:
                 st.write("Keine Vorschläge in der Warteschlange.")
 
     st.divider()
 
-    # 2. EINGABE-FORMULAR (Für PC und Handy)
-    st.subheader("➕ Neuen Bodenwert erfassen")
+    # 2. DETAIL-EINGABE (Für PC und Handy)
+    st.subheader("➕ Detaillierte Bodenmessung erfassen")
     with st.form("boden_form"):
-        f_plz = st.text_input("PLZ", "8160")
-        f_kalk = st.checkbox("Kalkhaltiger Boden?")
-        f_note = st.text_input("Anmerkung (z.B. Straßenecke)")
+        c1, c2 = st.columns(2)
+        with c1:
+            f_plz = st.text_input("PLZ", "8160")
+            f_typ = st.selectbox(
+                "Bodentyp", ["Lehm", "Sand", "Ton", "Humus", "Schluff"]
+            )
+        with c2:
+            f_kalk = st.text_input("Kalkgehalt (z.B. '7%' oder 'Hoch')", "normal")
+            f_humus = st.text_input("Humusgehalt (z.B. '3.5%')", "normal")
 
-        submit = st.form_submit_button("Eintrag speichern / vorschlagen")
+        f_note = st.text_input("Interne Anmerkung (z.B. Gasse / Beet)")
+
+        submit = st.form_submit_button("Eintrag senden")
 
         if submit:
             if not IS_LOCAL:
                 # Mobil-Nutzer schreibt in 'pending'
-                if save_to_pending(f_plz, f_kalk, f_note):
-                    st.info(
-                        "✅ Vorschlag wurde zur Prüfung an die Workstation gesendet."
+                if save_to_pending(f_plz, f_kalk, f_typ, f_humus, f_note):
+                    st.success(
+                        "✅ Vorschlag gesendet! Bitte klicke jetzt am Handy auf 'Backup starten'."
                     )
             else:
-                # Du am PC darfst direkt schreiben
-                if save_to_master(f_plz, f_kalk, f_note):
-                    st.success(f"✅ Daten direkt auf SSD (E:) gespeichert.")
+                # Du am PC schreibst direkt auf Laufwerk E:
+                if save_to_master(f_plz, f_kalk, f_typ, f_humus):
+                    st.success(f"✅ Daten direkt auf Kingston SSD (E:) gespeichert.")
 
     # 3. DATEN-EINSICHT (Master-Tabelle)
     st.subheader("📂 Aktuelle Master-Datenbank")
@@ -405,8 +430,8 @@ elif page == "Boden-Verwaltung":
             with sqlite3.connect(DB_PATH) as conn:
                 df = pd.read_sql_query("SELECT * FROM boden_daten", conn)
                 st.dataframe(df, use_container_width=True)
-        except:
-            st.info("Datenbank noch leer.")
+        except Exception as e:
+            st.info(f"Datenbank ist noch leer oder Tabellenstruktur weicht ab: {e}")
 
 
 # --- SEITE: GARTEN-KARTE ---
